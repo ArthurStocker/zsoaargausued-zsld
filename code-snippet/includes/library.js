@@ -1,240 +1,18 @@
-/**
- * Lagedarstellung globale Koniguration im Script 
- *
- * Die konfiguration ist in der Produktiven umgebung im PHP
- * config/settings.php
- * TODO: konfig aus dem einstellungen.xlsx lesen
- */
-// Voreingestellte Endpunkte 
-var URL_GEOJSON_STYLE = '//zso-aargausued.ch/map/api/read.php?type=style&object=default&id=0';
-var URL_GEOJSON_FEATURE = '//zso-aargausued.ch/map/api/read.php?type=feature&object=lage&id=0';
-var URL_GEOJSON_FEATURE_YAH = '//zso-aargausued.ch/map/api/read.php?type=feature&object=standort&id=0';
-
-// HTML mit den Endpunkten beladen
-setUrl('style-url', URL_GEOJSON_STYLE);
-setUrl('feature-url', URL_GEOJSON_FEATURE);
-setUrl('feature-yha-url', URL_GEOJSON_FEATURE_YAH);
-
-var FADING_DURATION = 500;
-var DISPLAY_DURATION = 5000;
-
-
-/**
- * Allgemeine Funktionen und Helper
- *
- * 
- * 
- * TODO: 
- */
-// Endpunkte setzen
-function setUrl(name, value) {
-  var elRequest = ':input[name=' + name + ']';
-  $(elRequest).val(value);
-}
-
-// Endpunkte lesen
-function getUrl(name) {
-  var elRequest = ':input[name=' + name + ']';
-  return $(elRequest).val();
-}
-
-// Show info message
-function info(msg) {
-  $('.alert-info').text(msg);
-  $('.alert-info').toggle(FADING_DURATION).delay(DISPLAY_DURATION).toggle(FADING_DURATION);
-}
-
-// Show danger message
-function failed(msg) {
-  $('.alert-danger').text(msg);
-  $('.alert-danger').toggle(FADING_DURATION).delay(DISPLAY_DURATION).toggle(FADING_DURATION);
-}
-
-// Show success message
-function passed(msg) {
-  $('.alert-success').text(msg);
-  $('.alert-success').toggle(FADING_DURATION).delay(DISPLAY_DURATION).toggle(FADING_DURATION);
-}
-
-
-/**
- * GeoAdmin Map global erstellen und ZSO Lagedarstellung API definieren
- *
- * 
- * 
- * TODO: 
- */
-// Create ZSO Lagedarstellung API
-var zsld = {};
-
-// Create a GeoAdmin Map
-zsld.MAP = new ga.Map({
-
-  // Define the div where the map is placed
-  target: 'map',
-
-  // Create a view
-  view: new ol.View({
-
-    // Define the default resolution
-    // 10 means that one pixel is 10m width and height
-    // List of resolution of the WMTS layers:
-    // 650, 500, 250, 100, 50, 20, 10, 5, 2.5, 2, 1, 0.5, 0.25, 0.1
-    resolution: 20,
-
-    // Define a coordinate CH1903 (EPSG:2056) for the center of the view
-    //center: [2660000, 1190000]
-    center: [2651507.75, 1242189.5]
-  })
-});
-
-
-/**
- * GeoAdmin Map Layer global erstellen
- *
- * 
- * 
- * TODO: Initiale visibilität aus den Einstellungen lesen und anwenden
- */
 // Create a background layer
-zsld.BackgroundLayer = ga.layer.create('ch.swisstopo.pixelkarte-farbe');
+zsld.LAYERS.add('BackgroundLayer', { map: 'ch.swisstopo.pixelkarte-farbe', visible: true });
 
 // Create a coordinate grid CH1903+/LV95 (org.epsg.grid_2056)
-zsld.KoordinatennetzLayer = ga.layer.create('org.epsg.grid_2056');
+zsld.LAYERS.add('KoordinatennetzLayer', { map: 'org.epsg.grid_2056', visible: true });
 
 // Create a community grid layer
-zsld.GemeindeLayer = ga.layer.create('ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill');
-
-// Vector layer variable declaration and initialization
-zsld.olSource = new ol.source.Vector();
-zsld.olVector = new ol.layer.Vector({
-  source: zsld.olSource
-});
-
-// Add the layers to the map
-zsld.MAP.addLayer(zsld.BackgroundLayer);
-zsld.MAP.addLayer(zsld.KoordinatennetzLayer);
-zsld.MAP.addLayer(zsld.GemeindeLayer);
-
-
-// set Initilal visibility to false
-zsld.GemeindeLayer.setVisible(false);
-
-
-/**
- * GeoAdmin Map Layer Helper
- *
- * 
- * 
- * TODO: 
- */
-// GeoJSON Parser variable declaration and initialization
-zsld.olGeoJSONParser = new ol.format.GeoJSON();
-
-// Check if the map has a vector layer
-// TODO: Is this really deterministic?
-//       Or do we have to check details of each layer.
-function hasVectorOnMap() {
-  if (zsld.MAP.getLayers().getArray().length > 1) {
-    return true;
-  }
-};
+zsld.LAYERS.add('GemeindeLayer', { map: 'ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill', visible: false });
 
 
 
-// Load and apply features file function
-var setLayerSource = function() {
-  $.ajax({
-    type: 'GET',
-    url: getUrl('feature-url'),
-    success: function(data) {
-      zsld.olSource.clear();
-      zsld.olSource.addFeatures(
-        zsld.olGeoJSONParser.readFeatures(data)
-      );
-      passed('');
-    },
-    error: function() {
-      zsld.olSource.clear();
-      failed('');
-    }
-  });
-};
 
-// Load and apply styling file function
-var setLayerStyle = function() {
-  $.ajax({
-    type: 'GET',
-    url: getUrl('style-url'),
-    success: function(data) {
-      var olStyleForVector = new ga.style.StylesFromLiterals(data);
-      zsld.olVector.setStyle(function(feature) {
-        return [olStyleForVector.getFeatureStyle(feature)];
-      });
-      $('#editor').text(JSON.stringify(data, null, 4));
-      passed('');
-    },
-    error: function() {
-      failed('');
-    }
-  });
-};
 
-// Load styling file in editor
-var loadStyling = function() {
-  $.ajax({
-    type: 'GET',
-    url: getUrl('style-url'),
-    success: function(data) {
-      //$('#editor').val('');
-      $('#editor').text(JSON.stringify(data, null, 4));
-      passed('');
-    },
-    error: function() {
-      failed('');
-    }
-  });
-};
 
-// Apply style changes from editor
-var applyStyling = function() {
-  if (hasVectorOnMap()) {
-    zsld.MAP.removeLayer(zsld.olVector);
-  }
-  var data = JSON.parse($('#editor').val());
-  var olStyleForVector = new ga.style.StylesFromLiterals(data);
-  zsld.olVector.setStyle(function(feature) {
-    return [olStyleForVector.getFeatureStyle(feature)];
-  });
-  setLayerSource();
-  zsld.MAP.addLayer(zsld.olVector);
-};
 
-// Apply GeoJSON config from urls
-var addLayer = function() {
-
-  // Load Styling file
-  setLayerStyle();
-
-  // Load Geojson file
-  setLayerSource();
-
-  // Only one vector layer is added
-  if (hasVectorOnMap()) {
-    zsld.MAP.removeLayer(zsld.olVector);
-  }
-
-  // Add Geojson layer
-  zsld.MAP.addLayer(zsld.olVector);
-
-}
-
-// Remove vector layer from map
-var removeLayer = function() {
-  if (zsld.olVector) {
-    zsld.MAP.removeLayer(zsld.olVector);
-  }
-};
 
 // Popup showing and removing at the position the user clicked
 var element = document.createElement('div');
@@ -254,7 +32,7 @@ zsld.MAP.on('singleclick', function(evt) {
   element.popover('destroy');
   if (feature) {
     popup.setPosition(evt.coordinate);
-    console.log('feature details: ', feature);
+    console.info('feature details: ', feature);
     element.popover({
       'placement': 'top',
       'animation': false,
@@ -377,7 +155,7 @@ function FeatureFactory() {
       this.add = function(featureSet, type) {
         if (type == 'object') {
           var olFeature = parser.readFeature(featureSet);
-          console.log(olFeature);
+          console.info('controller ', olFeature);
           olFeature.setStyle(olStyle);
           olSource.addFeature(olFeature);
         } else {
@@ -390,7 +168,7 @@ function FeatureFactory() {
           } else if (type == 'collection') {
             olFeatures = parser.readFeatures(featureSet);
           }
-          console.log(olFeatures);
+          console.info('controller ', olFeatures);
           for (f = 0; f < olFeatures.length; f++) {
             olFeatures[f].setStyle(olStyle);
           }
@@ -408,80 +186,9 @@ function FeatureFactory() {
 }
 
 //
-var controller = (new FeatureFactory()).$get(zsld.MAP, zsld.olSource, zsld.olVector, ((new StyleFactory()).$get()).get('select'), zsld.olGeoJSONParser);
+var controller = (new FeatureFactory()).$get(zsld.MAP, zsld.olSource, zsld.olVector, ((new StyleFactory()).$get()).get('select'), zsld.GEOJSONPARSER);
 
-// ApiFactory Class
-var ApiFactory = function() {
-  var success = '';
-  var error = '';
-  var type = '';
-  var url = '';
 
-  function request() {
-    $.ajax({
-      type: type,
-      url: url,
-      success: passed,
-      error: error
-    });
-  }
-
-  this.$get = function(s, e) {
-    if (s instanceof Function) {
-      success = s;
-    } else {
-      success = function(data) {
-        console.log('REST call response: ', data);
-        passed('REST call passed');
-      }
-    }
-
-    if (e instanceof Function) {
-      error = e;
-    } else {
-      error = function() {
-        console.log('REST call response: ', data);
-        failed('REST call failed');
-      }
-    }
-
-    var Endpoint = function() {
-      this.get = function(u, p) {
-        v = {};
-        type = 'GET';
-        hasParams = false;
-
-        for (var i in p.params) {
-          if (p.params.hasOwnProperty(i)) {
-            hasParams = true;
-            if (p.params[i])
-              v[i] = p.params[i];
-          }
-        }
-        url = hasParams ? u + '?' + $.param(v) : u;
-
-        request();
-      };
-      /**
-       * Return obj with objects properties
-       * @param objects[1...n]
-       * @returns obj a new object based on objects
-       */
-      this.extend = function() {
-        var obj = {};
-        for (_obj in arguments) {
-          for (var i in arguments[_obj]) {
-            if (arguments[_obj].hasOwnProperty(i)) {
-              obj[i] = arguments[_obj][i];
-            }
-          }
-        }
-        return obj;
-      }
-    };
-    return new Endpoint();
-  };
-}
 
 // Query Class
 function Query() {
@@ -551,7 +258,7 @@ function Query() {
       this.get = function(olMap, olLayers, olGeometry, tolerance,
         returnGeometry, timeout, limit, order, offset, where) {
         if (!olMap || !olLayers) {
-          return console.log('Missing required parameters');
+          return console.warn('Missing required parameters');
         }
         var mapParams = getMapParams(olMap, DPI);
         var layersParams = getLayersParams(olLayers, gaTime);
@@ -589,14 +296,8 @@ function Query() {
 
 
 //
-function test(data) {
-  console.log(data);
-  controller.add(data.results[0]);
-}
-
-//
 function processor(data) {
-  console.log(data.results);
+  console.info('processor ', data.results);
   if (data.results.length == 1) {
     controller.add(data.results[0], 'object');
   } else if (data.results.length > 1) {
@@ -605,7 +306,7 @@ function processor(data) {
 }
 
 //
-var query = (new Query()).$get((new ApiFactory()).$get(processor), GeoAdmin, null);
+var query = (new Query()).$get(new Rest(processor), GeoAdmin, null);
 
 
 
@@ -683,10 +384,10 @@ var selectChange = function(e) {
 
 var execQuery = function() {
   // Show the community grid layers on the map
-  zsld.GemeindeLayer.setVisible(true);
+  zsld.LAYERS.isActiveOnMap('GemeindeLayer', true);
 
   var lyrs = new ol.Collection();
-  lyrs.push(zsld.GemeindeLayer);
+  lyrs.push(zsld.LAYERS['GemeindeLayer']);
 
   var string = '';
   var conditions = getConditions();
@@ -728,7 +429,7 @@ var execQuery = function() {
     });
   });
 
-  console.log(string);
+  console.debug('execQuery ', string);
 
   query.get(zsld.MAP, lyrs, undefined, 5, true, undefined, undefined, undefined, undefined, string);
   //"id = 4006 or id = 4146 or gemname ilike '%Oberkulm%'"
@@ -792,7 +493,7 @@ $('#search').on('typeahead:selected', function(evt, location, suggName) {
   console.log('search results: ', location);
 
   // Hide the community grid layers on the map
-  zsld.GemeindeLayer.setVisible(false);
+  zsld.LAYERS.isActiveOnMap('GemeindeLayer', false);
 
   var originZoom = {
     address: 10,
@@ -825,10 +526,7 @@ $('#search').on('typeahead:selected', function(evt, location, suggName) {
       url: getUrl('style-url'),
       success: function(data) {
         console.log('styles: ', data);
-        var olStyleForVector = new ga.style.StylesFromLiterals(data);
-        zsld.olVector.setStyle(function(feature) {
-          return [olStyleForVector.getFeatureStyle(feature)];
-        });
+        zsld.VECTORS.add('SEARCH', { clear: true, activate: true, overwrite: true }).setStyles(data);
       },
       error: function() {
         failed('');
@@ -849,26 +547,12 @@ $('#search').on('typeahead:selected', function(evt, location, suggName) {
 
         console.log('feature: ', data);
 
-        zsld.olSource.clear();
-        zsld.olSource.addFeatures(
-          zsld.olGeoJSONParser.readFeatures(data)
-        );
+        zsld.VECTORS.add('SEARCH', { clear: true, activate: true, overwrite: true }).addFeatures(zsld.GEOJSONPARSER.readFeatures(data));
       },
       error: function() {
-        zsld.olSource.clear();
         failed('');
       }
     });
-
-
-    // Only one vector layer is added
-    if (hasVectorOnMap()) {
-      zsld.MAP.removeLayer(zsld.olVector);
-    }
-
-    // Add GeoJSON layer
-    zsld.MAP.addLayer(zsld.olVector);
-
 
     view.setZoom(zoom);
     view.setCenter(center);

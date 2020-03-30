@@ -1,4 +1,6 @@
 <?php
+define("SERVICEWORKER", "zsld-service-worker.js");
+
 define("DATA_PATH","../../../Public/");
 
 define("URL_GEOJSON_STYLE","//kp.zso-aargausued.ch:8443/map/api/read.php?type=style&object=default&id=0");

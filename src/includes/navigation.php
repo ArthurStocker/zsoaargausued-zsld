@@ -2,12 +2,19 @@
 <span class="panel-item-nav-left">
     <?php 
         $path  = './includes/nav/items';
+        $files = array();
 
         foreach (new DirectoryIterator($path) as $file) {
             if ($file->isDot()) continue;
             if ($file->getExtension() == 'php') {
-                include($path . "/" . $file->getFilename());
+                $files[] = $file->getFilename();
             }
+        }
+
+        sort($files);
+
+        foreach ($files as $file) {
+            include($path . "/" . $file);
         }
     ?>
 </span>
@@ -22,12 +29,19 @@
 <span class="panel-item-nav-right">
     <?php
         $path  = './includes/nav/admin';
+        $files = array();
 
         foreach (new DirectoryIterator($path) as $file) {
             if ($file->isDot()) continue;
             if ($file->getExtension() == 'php') {
-                include($path . "/" . $file->getFilename());
+                $files[] = $file->getFilename();
             }
+        }
+
+        sort($files);
+
+        foreach ($files as $file) {
+            include($path . "/" . $file);
         }
     ?>
 </span>

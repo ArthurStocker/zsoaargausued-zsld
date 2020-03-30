@@ -7,4 +7,8 @@
 <script>
 <?php include('config/settingsjs.php');?>
 </script>
+<script src="/map/class/Rest.js"></script>
+<script src="/map/includes/lib/helper.js"></script>
+<script src="/map/includes/lib/map.js"></script>
+<script src="/map/includes/lib/api.js"></script>
 <script src="/map/script.js"></script>
