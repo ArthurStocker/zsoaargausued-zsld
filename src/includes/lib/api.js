@@ -53,7 +53,7 @@ zsld.VECTORS.add = function(name) {
         if (styles) {
           this.styles = styles;
         }
-        console.debug('[{api.js} zsld.VECTORS.' + name + '.setStyles] styles ', this.styles, this.options);
+        console.debug("[{api.js} zsld.VECTORS." + name + ".setStyles] styles ", this.styles, this.options);
         if (!!this.styles) {
           var olStyleForVector = new ga.style.StylesFromLiterals(this.styles);
           this.layer.setStyle(function(feature) {
@@ -66,13 +66,13 @@ zsld.VECTORS.add = function(name) {
         if (options && options.clear) this.remove();
         if (features && (this.features.length == 0 || (this.options && (!!this.options.append || !!this.options.overwrite)))) {
           if (!!this.options.overwrite) {
-            this.features = [];
+            this.features = features;
           }
           if (!!this.options.append) {
             this.features = this.features.concat(features);
           }
         }
-        console.debug('[{api.js} zsld.VECTORS.' + name + '.addFeatures] features ', this.features, this.options);
+        console.debug("[{api.js} zsld.VECTORS." + name + ".addFeatures] features ", this.features, this.options);
         if (this.features.length > 0) {
           this.source.addFeatures(
             this.features

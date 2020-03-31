@@ -38,7 +38,7 @@
                                     onClick="this.select();"
                                     value="<?php echo URL_GEOJSON_STYLE ?>">
                                 <span class="input-group-btn">
-                                <button class="btn btn-default" type="button" onclick=loadStyling(true)>Load styling</button>
+                                <button type="button" class="btn btn-default" type="button" onclick="geojson_loadStyles(true)">Load styling</button>
                                 </span>
                             </div>
                             <form id="editor-form" name="editor-form" style="padding: 10px 0px 10px 0px">
@@ -49,7 +49,7 @@
                             </form>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-default" onclick=applyStyling()>Apply styling</button>
+                            <button type="button" class="btn btn-default" onclick="geojson_applyStyling()">Apply styling</button>
                         </div>
 
                     </div>
@@ -57,8 +57,8 @@
 
                 <div class="modal-footer">
                     <div class="btn-group">
-                        <button class="btn btn-default" onclick=removeLayer()>Remove layer</button>
-                        <button class="btn btn-primary" onclick=addLayer()>Add layer</button>
+                        <button type="button" class="btn btn-default" onclick="geojson_removeLayer()">Remove layer</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="geojson_addLayer()">Add layer</button>
                     </div>
                 </div>
                 
@@ -69,56 +69,56 @@
 
     <script>
         // Load styles
-        var loadStyles = function(editor_only) {
+        var geojson_loadStyles = function(editor_only) {
             $http = new Rest(
-            function(data) {
-                console.info('Styles successfully loaded ', data);
-                if (!editor_only) zsld.VECTORS.add('GEOJSON').setStyles(data);
-                $('#editor-content').text(JSON.stringify(data, null, 4));
-                passed('Styles successfully loaded');
-            },
-            function() {
-                console.error('Error attempting to load styles ', data);
-                $('#editor-content').text('');
-                failed('Error attempting to load styles');
-            }
+                function(data) {
+                    console.info('Styles successfully loaded ', data);
+                    if (!editor_only) zsld.VECTORS.add('GEOJSON').setStyles(data);
+                    $('#editor-content').text(JSON.stringify(data, null, 4));
+                    passed('Styles successfully loaded');
+                },
+                function(data) {
+                    console.error('Error attempting to load styles ', data);
+                    $('#editor-content').text('');
+                    failed('Error attempting to load styles');
+                }
             );
             $http.get(getUrl('style-url'));
         };
 
         // Apply style changes from editor
-        var applyStyling = function() {
+        var geojson_applyStyling = function() {
             var data = JSON.parse($('#editor-content').val());
             zsld.VECTORS.add('GEOJSON').setStyles(data);
             loadFeatures();
         };
 
         // Load features
-        var loadFeatures = function() {
+        var geojson_loadFeatures = function() {
             $http = new Rest(
-            function(data) {
-                console.info('Features successfully loaded ', data);
-                zsld.VECTORS.add('GEOJSON').addFeatures(zsld.GEOJSONPARSER.readFeatures(data), { clear: true, activate: true, append:true, overwrite: false });
-                passed('Features successfully loaded');
-            },
-            function() {
-                console.error('Error attempting to load features ', data);
-                zsld.VECTORS.remove('GEOJSON', true, true);
-                failed('Error attempting to load features');
-            }
+                function(data) {
+                    console.info('Features successfully loaded ', data);
+                    zsld.VECTORS.add('GEOJSON').addFeatures(zsld.GEOJSONPARSER.readFeatures(data), { clear: true, activate: true, append:true, overwrite: false });
+                    passed('Features successfully loaded');
+                },
+                function(data) {
+                    console.error('Error attempting to load features ', data);
+                    zsld.VECTORS.remove('GEOJSON', true, true);
+                    failed('Error attempting to load features');
+                }
             );
             $http.get(getUrl('feature-url'));
         };
 
         // Remove vector layer from map
-        var removeLayer = function() {
+        var geojson_removeLayer = function() {
             zsld.VECTORS.remove('GEOJSON', true, true);
         };
 
         // Apply GeoJSON config from urls
-        var addLayer = function() {
-            loadStyles();
-            loadFeatures();
+        var geojson_addLayer = function() {
+            geojson_loadStyles();
+            geojson_loadFeatures();
         }
     </script>
 

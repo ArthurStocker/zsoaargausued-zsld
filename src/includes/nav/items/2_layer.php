@@ -21,10 +21,10 @@
                 <div class="modal-body">
                     <div id="layer-container" lass="form-horizontal collapse in" aria-expanded="true" style="">
 
-                        <div class="form-group">
-                            <label>Features</label>
+                        <div id="zsld-layers" class="form-group">
 
                         </div>
+                        
                     </div>
                 </div>
 

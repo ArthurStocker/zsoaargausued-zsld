@@ -35,6 +35,39 @@ zsld.MAP = new ga.Map({
   })
 });
 
+zsld.MAP.addOverlay(
+  (function() {
+    // Popup showing and removing at the position the user clicked
+    var element = document.createElement('div');
+    element.setAttribute('id', 'popup');
+    element.classList.add('popup');
+    zsld.POPUP = new ol.Overlay({
+      element: element
+    });
+    return zsld.POPUP;
+  })()
+);
+
+zsld.MAP.on('singleclick', function(evt) {
+  var feature = zsld.MAP.forEachFeatureAtPixel(evt.pixel, function(feat, layer) {
+    return feat;
+  });
+  var element = $(zsld.POPUP.getElement());
+  element.popover('destroy');
+  if (feature) {
+    zsld.POPUP.setPosition(evt.coordinate);
+    console.debug("[{map.js} zsld.MAP.on('singleclick')] feature ", feature);
+    element.popover({
+      'placement': 'top',
+      'animation': false,
+      'html': true,
+      'title': feature.get('title'),
+      'content': feature.get('description')
+    }).popover('show');
+  }
+
+});
+
 /**
  * OpenLayer Parser und Helper
  *
@@ -44,3 +77,26 @@ zsld.MAP = new ga.Map({
  */
 // GeoJSON Parser initialization
 zsld.GEOJSONPARSER = new ol.format.GeoJSON();
+
+/**
+ * Bloodhound suggestion engine
+ *
+ * 
+ * 
+ * TODO: 
+ */
+// Bloodhound suggestion engine initialization 
+zsld.BLOODHOUND = new Bloodhound({
+  limit: 30,
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  remote: {
+    url: GeoAdmin.serviceUrl + URL_GA_SEARCH,
+    filter: function(locations) {
+      return locations.results;
+    }
+  }
+});
+// This kicks off the loading and processing of local and prefetch data,
+// the suggestion engine will be useless until it is initialized
+zsld.BLOODHOUND.initialize();

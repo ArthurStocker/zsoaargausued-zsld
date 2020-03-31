@@ -20,6 +20,12 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.warn('Service Worker or Push Manager is not supported!');
 }
 
+// GeoAdmin Einstellungen
+var URL_GA_SEARCH = '<?php echo URL_GA_SEARCH;?>';
+
+// ZSO Lagedarstellung Einstellungen
+var URL_ZSLD_SETTINGS = '<?php echo URL_ZSLD_SETTINGS;?>';
+
 // Anzeige Einstellungen
 var FADING_DURATION = <?php echo FADING_DURATION;?>;
 var DISPLAY_DURATION = <?php echo DISPLAY_DURATION;?>;

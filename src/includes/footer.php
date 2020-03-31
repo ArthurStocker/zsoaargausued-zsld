@@ -11,4 +11,36 @@
 <script src="/map/includes/lib/helper.js"></script>
 <script src="/map/includes/lib/map.js"></script>
 <script src="/map/includes/lib/api.js"></script>
+<?php 
+    $files = array();
+
+    foreach (new DirectoryIterator(ITEM_PATH) as $file) {
+        if ($file->isDot()) continue;
+        if ($file->getExtension() == 'js') {
+            $files[] = $file->getFilename();
+        }
+    }
+
+    sort($files);
+
+    foreach ($files as $file) {
+        echo '<script src="' . ITEM_PATH . '/' . $file . '"></script>';
+    }
+?>
+<?php 
+    $files = array();
+
+    foreach (new DirectoryIterator(ADMIN_PATH) as $file) {
+        if ($file->isDot()) continue;
+        if ($file->getExtension() == 'js') {
+            $files[] = $file->getFilename();
+        }
+    }
+
+    sort($files);
+
+    foreach ($files as $file) {
+        echo '<script src="' . ADMIN_PATH . '/' . $file . '"></script>';
+    }
+?>
 <script src="/map/script.js"></script>

@@ -1,10 +1,9 @@
 <!-- partial:navigationgrid -->
 <span class="panel-item-nav-left">
     <?php 
-        $path  = './includes/nav/items';
         $files = array();
 
-        foreach (new DirectoryIterator($path) as $file) {
+        foreach (new DirectoryIterator(ITEM_PATH) as $file) {
             if ($file->isDot()) continue;
             if ($file->getExtension() == 'php') {
                 $files[] = $file->getFilename();
@@ -14,7 +13,7 @@
         sort($files);
 
         foreach ($files as $file) {
-            include($path . "/" . $file);
+            include(ITEM_PATH . "/" . $file);
         }
     ?>
 </span>
@@ -28,10 +27,9 @@
 
 <span class="panel-item-nav-right">
     <?php
-        $path  = './includes/nav/admin';
         $files = array();
 
-        foreach (new DirectoryIterator($path) as $file) {
+        foreach (new DirectoryIterator(ADMIN_PATH) as $file) {
             if ($file->isDot()) continue;
             if ($file->getExtension() == 'php') {
                 $files[] = $file->getFilename();
@@ -41,7 +39,7 @@
         sort($files);
 
         foreach ($files as $file) {
-            include($path . "/" . $file);
+            include(ADMIN_PATH . "/" . $file);
         }
     ?>
 </span>

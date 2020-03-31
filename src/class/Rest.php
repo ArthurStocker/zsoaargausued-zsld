@@ -7,6 +7,9 @@ include_once('../config/settings.php');
 require_once __DIR__.'/SimpleXLSX.php';
 
 class Rest{
+    
+    private $config;
+
     private function transformFeature($row, $fields) {
         $title = '';
         $content = '';
@@ -89,21 +92,44 @@ class Rest{
     }
     private function buildObject($obj) {
         $geojson = new stdClass();
-        if ($obj === 'feature') {
-            $geojson->type = 'FeatureCollection';
-            $geojson->features = [];
-		}
-		if ($obj === 'style') {
+        if ($obj === 'style') {
             $geojson->type = 'unique';
             $geojson->property = 'style-class';
             $geojson->values = [];
         }
+        if ($obj === 'feature') {
+            $geojson->type = 'FeatureCollection';
+            $geojson->features = [];
+        }
+        if ($obj === 'system') {
+            $geojson->type = 'SystemProperties';
+            $geojson->properties = [];
+		}
         return $geojson;
+    }
+    public function fileList(){
+        $files = array();
+        $this->config = new stdClass();
+
+        foreach (new DirectoryIterator(DATA_PATH) as $file) {
+            if ($file->isDot()) continue;
+            if ($file->getExtension() == 'xlsx') {
+                $files[] = $file->getBasename('.xlsx');
+            }
+        }
+    
+        sort($files);
+    
+        foreach ($files as $file) {
+
+        }
+        $this->config->files = $files;
     }
 	public function getObjects($type, $obj, $obj_id) {
         $data = '';
-        if ($xlsx = SimpleXLSX::parse(DATA_PATH . $obj . '.xlsx')) {
+        $this->fileList();
 
+        if ($xlsx = SimpleXLSX::parse(DATA_PATH . $obj . '.xlsx')) {
             // Produce array keys from the array values of 1st array element
             $fields = $rows = [];
 
@@ -114,11 +140,14 @@ class Rest{
                     $fields = $r;
                     continue;
                 }
+                if ($type === 'style') {
+                    $geojson->values[] = $this->transformStyle( array_combine( $fields, $r) );
+                }
                 if ($type === 'feature') {
                     $geojson->features[] = $this->transformFeature( array_combine( $fields, $r), $fields );
                 }
-                if ($type === 'style') {
-                    $geojson->values[] = $this->transformStyle( array_combine( $fields, $r) );
+                if ($type === 'system') {
+                    $geojson->properties[] = array_combine( $fields, $r );
                 }
             }
             $data = $geojson;

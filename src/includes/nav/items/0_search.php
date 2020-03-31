@@ -48,11 +48,22 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default" onclick="search_removeLayer()">Remove layer</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
 
             </div>
+
         </div>
     </div>
+    
+    <script>
+        // Remove vector layer from map
+        var search_removeLayer = function() {
+            zsld.VECTORS.remove('SEARCH', true, true);
+        };
+    </script>
 
 </span>
