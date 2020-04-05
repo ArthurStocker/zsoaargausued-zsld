@@ -21,21 +21,16 @@
                 <div class="modal-body">
                     <div id="settings-container" lass="form-horizontal collapse in" aria-expanded="true" style="">
 
-                        <div class="form-group">
-                            <label>Layers</label>
+                        <div id="ga-layers" class="form-group">
 
                         </div>
-                        <div class="form-group">
-                            <label>Styles</label>
 
-
-                        </div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <div class="btn-group">
-                        <button class="btn btn-primary" onclick=saveSettings()>Save</button>
+                        <button class="btn btn-primary" data-dismiss="modal">Save</button>
                     </div>
                 </div>
                 

@@ -1,26 +1,14 @@
 /**
- * Lagedarstellung globale Koniguration im Script 
+ * Lagedarstellung globale Konfiguration im Script 
  *
- * Die Konfigurationswerte ist im config/settings.php
+ * CODEPEN Config
  */
-// Service Worker
-var SW_REGISTRATION;
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('<?php echo SERVICEWORKER;?>')
-    .then(registration => {
-      console.log('Service Worker registered with scope:', registration.scope);
-      SW_REGISTRATION = registration;
-    })
-    .catch(err => {
-      console.error('Service Worker registration failed:', err);
-    });
-  });
-} else {
-  console.warn('Service Worker or Push Manager is not supported!');
-}
-
 <?php
+define("SYSTEM", "kp");
+define("SETTINGS", "/../../../Public/settings.xlsx");
+
+require_once __DIR__.'/../class/SimpleXLSX.php';
+
 if ($xlsx = SimpleXLSX::parse(__DIR__ . SETTINGS)) {
   // Produce array keys from the array values of 1st array element
   $fields = $rows = [];
@@ -35,11 +23,11 @@ if ($xlsx = SimpleXLSX::parse(__DIR__ . SETTINGS)) {
     echo "var MAP_CENTER_X = " . $values['KoordinateX'] . ";\n";
     echo "var MAP_CENTER_Y = " . $values['KoordinateY'] . ";\n\n";
   }
-
+  
   foreach ( $xlsx->rows(1) as $k => $r ) {
     if ( $k === 0 ) {
-        $fields = $r;
-        continue;
+      $fields = $r;
+      continue;
     }
     $values = array_combine( $fields, $r );
     if ($values['active'] === 'true' && $values['hide'] === 'false' && ($values['system'] === 'all' || $values['system'] === SYSTEM) ) {

@@ -15,7 +15,7 @@
                     <button type="button" class="modal-close ga-btn close" data-dismiss="modal">
                         <i class="fa fa-times fa-1x" aria-hidden="true"></i>
                     </button>
-                    <h4 id="modal-label-layer" class="modal-title">Layers</h4>
+                    <h4 id="modal-label-layer" class="modal-title">Lagedarstellung</h4>
                 </div>
 
                 <div class="modal-body">
@@ -30,7 +30,7 @@
 
                 <div class="modal-footer">
                     <div class="btn-group">
-                        <button class="btn btn-primary" onclick=loadFeatures()>Display</button>
+                        <button class="btn btn-primary" onclick=zsld_ResetLayers()>Karten zurücksetzen</button>
                     </div>
                 </div>
                 
@@ -38,5 +38,17 @@
 
         </div>
     </div>
+
+    <script>
+        // Remove vector layer from map
+        var zsld_ResetLayers = function() {
+            $("#zsld-layers").children().each(function( index ) {
+                console.log( index + " " + $( this ).attr('id') + ": " + $( this ).text() );
+                zsld.VECTORS.remove(($( this ).attr('id')).replace('zsld-layer-', ''), true, true);
+            });
+            $("#zsld-layers").empty();
+            zsld_loadMaps();
+        };
+    </script>
 
 </span>

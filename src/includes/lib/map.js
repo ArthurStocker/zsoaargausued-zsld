@@ -31,7 +31,8 @@ zsld.MAP = new ga.Map({
 
     // Define a coordinate CH1903 (EPSG:2056) for the center of the view
     //center: [2660000, 1190000]
-    center: [2651507.75, 1242189.5]
+    //center: [2651507.75, 1242189.5]
+    center: [MAP_CENTER_Y, MAP_CENTER_X]
   })
 });
 

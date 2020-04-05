@@ -82,6 +82,7 @@ zsld.VECTORS.add = function(name) {
       },
       setVisible: function(visible) {
         this.layer.setVisible(!!visible);
+        zsld.MAP.updateSize();
       },
       remove: function(remove) {
         this.source.clear();

@@ -1,32 +1,42 @@
-// Set style
-$http = new Rest(
-  function(data) {
-    console.info('ZSLD layer successfully loaded ', data);
-    var title = '<label>Karten</label>';
-    $("#zsld-layers").append(title);
-    for (var i = 0; i < data.properties.length; i++) {
-      var layer = '';
-      layer += '<div class="form-check">';
-      layer += '    <input class="form-check-input" type="checkbox" value="' + data.properties[i].key + ':' + data.properties[i].style + '/' + data.properties[i].theme + ':' + data.properties[i].file + '/' + data.properties[i].id + '" id="' + data.properties[i].file + '" ' + (data.properties[i].show == 'true' ? 'checked' : '') + ' ' + (data.properties[i].active == 'true' ? '' : 'disabled') + '>';
-      layer += '    <label class="form-check-label" for="' + data.properties[i].file + '">' + data.properties[i].description + '</label>'
-      layer += '</div>';
-      $("#zsld-layers").append(layer);
-      if (data.properties[i].active == 'true') {
-        settings_loadStyles(data.properties[i]);
-        settings_loadFeatures(data.properties[i]);
+// Load Maps
+function zsld_loadMaps() {
+  $http = new Rest(
+    function(data) {
+      console.info('ZSLD layer successfully loaded ', data);
+      if (!$("#zsld-layers").length) {
+        var title = '<label class="zsld-layer-title">Karten</label>';
+        $("#zsld-layers").append(title);
       }
+      for (var i = 0; i < data.properties.length; i++) {
+        if (!$("#" + data.properties[i].file).length) {
+          var layer = '';
+          layer += '<div id="zsld-layer-' + data.properties[i].key + '" class="form-check">';
+          layer += '    <input class="form-check-input" type="checkbox" value="' + data.properties[i].key + ':' + data.properties[i].style + '/' + data.properties[i].theme + ':' + data.properties[i].file + '/' + data.properties[i].id + '" id="' + data.properties[i].file + '" ' + (data.properties[i].visible == 'true' ? 'checked' : '') + ' ' + (data.properties[i].active == 'true' ? '' : 'disabled') + '>';
+          layer += '    <label class="form-check-label" for="' + data.properties[i].file + '">' + data.properties[i].description + '</label>'
+          layer += '</div>';
+          $("#zsld-layers").append(layer);
+          if (data.properties[i].active == 'true') {
+            zsld_loadStyles(data.properties[i]);
+            zsld_loadFeatures(data.properties[i]);
+          }
+          $("#" + data.properties[i].file).change(function() {
+            console.debug('ZSLD layer ' + $(this).val().split(':')[0] + ' changed to visible ', $(this).is(':checked'));
+            zsld.VECTORS[$(this).val().split(':')[0]].setVisible(!!$(this).is(':checked'));
+          });
+        }
+      }
+      passed('ZSLD layer successfully loaded');
+    },
+    function(data) {
+      console.error('Error attempting to load ZSLD layer ', data);
+      failed('Error attempting to load ZSLD layer');
     }
-    passed('ZSLD layer successfully loaded');
-  },
-  function(data) {
-    console.error('Error attempting to load ZSLD layer ', data);
-    failed('Error attempting to load ZSLD layer');
-  }
-);
-$http.get(URL_ZSLD_SETTINGS);
+  );
+  $http.get(URL_ZSLD_SETTINGS);
+}
 
 // Load styles
-function settings_loadStyles(properties) {
+function zsld_loadStyles(properties) {
   $http = new Rest(
     function(data) {
       console.info('Styles for ' + properties.key + ' successfully loaded ', data);
@@ -46,11 +56,11 @@ function settings_loadStyles(properties) {
 }
 
 // Load features
-function settings_loadFeatures(properties) {
+function zsld_loadFeatures(properties) {
   $http = new Rest(
     function(data) {
       console.info('Features for ' + properties.key + ' successfully loaded ', data);
-      zsld.VECTORS.add(properties.key).addFeatures(zsld.GEOJSONPARSER.readFeatures(data), { clear: true, activate: properties.show, append: false, overwrite: true });
+      zsld.VECTORS.add(properties.key).addFeatures(zsld.GEOJSONPARSER.readFeatures(data), { clear: true, activate: (properties.visible == 'true'), append: false, overwrite: true });
       passed('Features for ' + properties.key + ' successfully loaded');
     },
     function(data) {
@@ -65,3 +75,5 @@ function settings_loadFeatures(properties) {
   console.debug('ZSLD layer feature URL ', url);
   $http.get(url);
 };
+
+zsld_loadMaps();

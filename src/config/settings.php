@@ -1,22 +1,25 @@
 <?php
-define("ICON_APPLE", "/apple-touch-icon.png");
-define("ICON_32", "/favicon-32x32.png");
-define("ICON_16", "/favicon-16x16.png");
-define("MANIFEST", "/site.webmanifest");
 
-define("SERVICEWORKER", "../p-zsld-service-worker.php");
+define("SYSTEM", "public");
+define("SETTINGS", "/../../../../../../Desktop/ZSO/settings.xlsx");
 
-define("DATA_PATH","/Users/arthur/Desktop/ZSO/");
+require_once __DIR__.'/../class/SimpleXLSX.php';
 
-define("ITEM_PATH","./includes/nav/items");
-define("ADMIN_PATH","./includes/nav/admin");
+if ($xlsx = SimpleXLSX::parse(__DIR__ . SETTINGS)) {
+    // Produce array keys from the array values of 1st array element
+    $fields = $rows = [];
 
-define("URL_GA_SEARCH","/rest/services/api/SearchServer?sr=2056&searchText=%QUERY&type=locations");
-
-define("URL_GEOJSON_STYLE","//zso-aargausued.ch/map/api/read.php?type=style&object=default&id=0");
-define("URL_GEOJSON_FEATURE","//zso-aargausued.ch/map/api/read.php?type=feature&object=lage&id=0");
-define("URL_GEOJSON_FEATURE_YAH","//zso-aargausued.ch/map/api/read.php?type=feature&object=standort&id=0");
-
-define("FADING_DURATION", "500");
-define("DISPLAY_DURATION", "5000");
+    foreach ( $xlsx->rows(1) as $k => $r ) {
+        if ( $k === 0 ) {
+            $fields = $r;
+            continue;
+        }
+        $values = array_combine( $fields, $r );
+        if ($values['active'] === 'true' && ($values['system'] === 'all' || $values['system'] === SYSTEM) ) {
+            define($values['key'], $values['value']);
+        }
+    }
+} else {
+    $data = SimpleXLSX::parseError();
+}
 ?>

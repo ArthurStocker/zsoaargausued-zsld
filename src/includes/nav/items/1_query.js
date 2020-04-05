@@ -1,24 +1,3 @@
-// Create a background layer
-zsld.LAYERS.add('BackgroundLayer', { map: 'ch.swisstopo.pixelkarte-farbe', visible: true });
-
-// Create a coordinate grid CH1903+/LV95 (org.epsg.grid_2056)
-zsld.LAYERS.add('KoordinatennetzLayer', { map: 'org.epsg.grid_2056', visible: true });
-
-// Create a community grid layer
-zsld.LAYERS.add('GemeindeLayer', { map: 'ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill', visible: false });
-
-
-
-
-
-
-
-
-
-
-
-
-
 // StyleFactory Class
 function StyleFactory() {
   var styles = [];
@@ -91,25 +70,25 @@ function StyleFactory() {
 
 // FeatureFactory Class
 function FeatureFactory() {
-  this.$get = function(gaMap, olSource, olVector, olStyle, parser) {
+  this.$get = function(gaMap, zsldLayer, olStyle, parser) {
     // Remove features associated with a layer.
     function removeFromLayer(olLayer) {
-      var features = olSource.getFeatures();
+      var features = zsldLayer.source.getFeatures();
       for (var i = 0, ii = features.length; i < ii; i++) {
         var layerId = features[i].get('layerId');
         if (layerId === olLayer.id) {
-          olSource.removeFeature(features[i]);
+          zsldLayer.source.removeFeature(features[i]);
         }
       }
     }
 
     // Add/remove/move to the top of the vector layer.
     function updateLayer(gaMap) {
-      if (!olSource.getFeatures().length) {
+      if (!zsldLayer.source.getFeatures().length) {
         ol.Observable.unByKey(listenerKeyRemove);
-        gaMap.removeLayer(olVector);
-      } else if (gaMap.getLayers().getArray().indexOf(olVector) === -1) {
-        gaMap.addLayer(olVector);
+        gaMap.removeLayer(zsldLayer.layer);
+      } else if (gaMap.getLayers().getArray().indexOf(zsldLayer.layer) === -1) {
+        gaMap.addLayer(zsldLayer.layer);
 
         // Add event for automatically removing the features when the
         // corresponding layer is removed.
@@ -129,7 +108,7 @@ function FeatureFactory() {
           var olFeature = parser.readFeature(featureSet);
           console.info('controller ', olFeature);
           olFeature.setStyle(olStyle);
-          olSource.addFeature(olFeature);
+          zsldLayer.source.addFeature(olFeature);
         } else {
           var olFeatures;
           if (type == 'array') {
@@ -144,7 +123,7 @@ function FeatureFactory() {
           for (f = 0; f < olFeatures.length; f++) {
             olFeatures[f].setStyle(olStyle);
           }
-          olSource.addFeatures(olFeatures);
+          zsldLayer.source.addFeatures(olFeatures);
         }
         updateLayer(gaMap);
       };
@@ -158,7 +137,7 @@ function FeatureFactory() {
 }
 
 //
-var controller = (new FeatureFactory()).$get(zsld.MAP, zsld.olSource, zsld.olVector, ((new StyleFactory()).$get()).get('select'), zsld.GEOJSONPARSER);
+var controller = (new FeatureFactory()).$get(zsld.MAP, zsld.VECTORS.add('TEMP_' + LAYER_GA_QUERY.toUpperCase()), ((new StyleFactory()).$get()).get('select'), zsld.GEOJSONPARSER);
 
 
 
@@ -356,10 +335,11 @@ var selectChange = function(e) {
 
 var execQuery = function() {
   // Show the community grid layers on the map
-  zsld.LAYERS.isActiveOnMap('GemeindeLayer', true);
+  if (!$('#' + LAYER_GA_QUERY).is(':checked'))
+    $('#' + LAYER_GA_QUERY).click();
 
   var lyrs = new ol.Collection();
-  lyrs.push(zsld.LAYERS['GemeindeLayer']);
+  lyrs.push(zsld.LAYERS[LAYER_GA_QUERY]);
 
   var string = '';
   var conditions = getConditions();
