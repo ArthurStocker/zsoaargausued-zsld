@@ -1,0 +1,23 @@
+/*-------------------------------
+ *            DataTable
+ *-------------------------------*/
+
+.tbl-right {
+  float: right;
+}
+
+.tbl-right-p50 {
+  float: right;
+  padding-right: 50px;
+}
+
+.tab-content {
+  padding: 10px;
+  border-left: solid 1px #ddd;
+  border-right: solid 1px #ddd;
+  border-bottom: solid 1px #ddd;
+}
+
+.zsld-transaction-tab-pane {
+  overflow: scroll;
+}

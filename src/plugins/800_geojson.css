@@ -1,0 +1,12 @@
+/*-------------------------------
+ *            GeoJSON
+ *-------------------------------*/
+
+.editor-form {
+  margin-top: 5px;
+}
+
+.editor-content {
+  min-height: 300px;
+  resize: none;
+}

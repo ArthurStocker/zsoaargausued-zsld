@@ -1,0 +1,2 @@
+<!-- partial:transactions -->
+<li><a id="nav-action-transactions" href="#" onclick="$('#modal-transactions').modal('toggle')"><i class="fas fa-exchange-alt fa-1x" aria-hidden="true"></i> Transaktionen</a></li>

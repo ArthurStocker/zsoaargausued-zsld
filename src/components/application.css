@@ -1,0 +1,100 @@
+/*-------------------------------
+ *           Application
+ *-------------------------------*/
+
+
+/*
+Extra small devices (phones, up to 480px) 
+
+@media screen and (max-width: 767px) {
+  body,
+  .dropdown-menu,
+  .btn {
+    font-size: 29px !important;
+  }
+}
+*/
+
+
+/* Small devices (phones/tablets, 768px and up) (min-width: 768px) */
+
+@media screen and (max-width: 991px) {
+  body,
+  .dropdown-menu,
+  .form-control,
+  .btn {
+    font-size: 24px !important;
+  }
+}
+
+
+/* tablets/desktops, 992px and up */
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  body,
+  .dropdown-menu,
+  .form-control,
+  .btn {
+    font-size: 19px !important;
+  }
+}
+
+
+/* large desktops, 1200px and up */
+
+@media screen and (min-width: 1200px) {
+  body,
+  .dropdown-menu,
+  .form-control,
+  .btn {
+    font-size: 14px !important;
+  }
+}
+
+body {
+  position: relative;
+  overflow-x: hidden;
+}
+
+body,
+html {
+  height: 100%;
+}
+
+.nav .open>a,
+.nav .open>a:hover,
+.nav .open>a:focus {
+  background-color: transparent;
+}
+
+
+/*-------------------------------
+ *           Modals
+ *-------------------------------*/
+
+.modal-btn {
+  display: none;
+}
+
+.modal-close {
+  margin: 0px 21px 0px 0px;
+}
+
+
+/*-------------------------------
+ *           Wrappers
+ *-------------------------------*/
+
+#wrapper {
+  width: 100%;
+  height: 100%;
+  padding-left: 0;
+  -webkit-transition: all 0.5s ease;
+  -moz-transition: all 0.5s ease;
+  -o-transition: all 0.5s ease;
+  transition: all 0.5s ease;
+}
+
+#wrapper.toggled {
+  padding-left: 220px;
+}

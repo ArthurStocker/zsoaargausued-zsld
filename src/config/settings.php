@@ -20,6 +20,6 @@ if ($xlsx = SimpleXLSX::parse(__DIR__ . SETTINGS)) {
         }
     }
 } else {
-    $data = SimpleXLSX::parseError();
+    define("ERROR", SimpleXLSX::parseError());
 }
 ?>

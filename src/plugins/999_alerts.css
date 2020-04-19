@@ -1,0 +1,15 @@
+/*-------------------------------
+ *            Alerts
+ *-------------------------------*/
+
+.alert {
+  width: 100%;
+  padding: 10px;
+}
+
+.alert-dismissible .close {
+  position: relative;
+  top: -2px;
+  right: 0px;
+  color: inherit;
+}

@@ -32,14 +32,8 @@ include('../class/Rest.php');
 $api = new Rest();
 switch($requestMethod) {
 	case 'GET':
-		if (isset($_GET['type'])) {
-			if (isset($_GET['object']) && isset($_GET['id'])) {
-				$api->read($_GET, (string)$_GET['type'], (string)$_GET['object'], (int)$_GET['id']);
-			} elseif (isset($_GET['object'])) {
-				$api->read($_GET, (string)$_GET['type'], (string)$_GET['object'], 0);
-			} else {
-				$api->read($_GET, (string)$_GET['type'], '', 0);
-			}
+		if (isset($_GET['type']) && isset($_GET['object'])) {
+			$api->update($_GET, (string)$_GET['type'], (string)$_GET['object']);
 		} else {
 			header("HTTP/1.0 404 Not Found");
 		}

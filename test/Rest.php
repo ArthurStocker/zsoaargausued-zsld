@@ -2,5 +2,5 @@
 chdir('../src/api/');
 include('../class/Rest.php');
 $r = new Rest();
-$r->getObjects('system', 'settings', 3);
+$r->read('system', 'settings', 3);
 ?>

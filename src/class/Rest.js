@@ -11,9 +11,11 @@
  * @todo 
  */
 // Rest Class
-var Rest = function(s, e) {
+var Rest = function(s, e, c) {
+  var statusCode = {};
   var success = '';
   var error = '';
+  var data = '';
   var type = '';
   var url = '';
 
@@ -21,16 +23,21 @@ var Rest = function(s, e) {
     $.ajax({
       url: url,
       type: type,
+      data: data,
       success: success,
-      error: error
+      error: error,
+      statusCode: statusCode,
+      xhrFields: {
+        withCredentials: true
+      }
     });
   }
 
-  this.$get = function(s, e) {
+  this.$get = function(s, e, c) {
     if (s instanceof Function) {
       success = s;
     } else {
-      success = function(data) {
+      success = function(data, status, request) {
         console.info('REST call passed ', data);
         passed('REST call passed');
       }
@@ -39,17 +46,55 @@ var Rest = function(s, e) {
     if (e instanceof Function) {
       error = e;
     } else {
-      error = function() {
-        console.error('REST call failed ', data);
+      error = function(request, status, error) {
+        console.error('REST call failed ', request);
         failed('REST call failed');
       }
     }
 
+    if (c instanceof Object) {
+      statusCode = c;
+    } else {
+      statusCode = {
+        303: function(request, status, error) {
+          console.error('REST call redirected ', request);
+          failed('REST call redirected');
+        }
+      }
+    }
+
     var Endpoint = function() {
-      this.get = function(u, p) {
+      this.get = function(u, d, p) {
         v = {};
         type = 'GET';
         hasParams = false;
+
+        if (d) {
+          data = d;
+        }
+
+        if (p && p.params) {
+          for (var i in p.params) {
+            if (p.params.hasOwnProperty(i)) {
+              hasParams = true;
+              if (p.params[i])
+                v[i] = p.params[i];
+            }
+          }
+        }
+        url = hasParams ? u + '?' + $.param(v) : u;
+
+        request();
+      };
+
+      this.post = function(u, d, p) {
+        v = {};
+        type = 'POST';
+        hasParams = false;
+
+        if (d) {
+          data = d;
+        }
 
         if (p && p.params) {
           for (var i in p.params) {
@@ -84,5 +129,5 @@ var Rest = function(s, e) {
     };
     return new Endpoint();
   };
-  return this.$get(s, e);
+  return this.$get(s, e, c);
 }

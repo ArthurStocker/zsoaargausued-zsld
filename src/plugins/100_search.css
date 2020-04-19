@@ -1,0 +1,16 @@
+/*-------------------------------
+ *            Search
+ *-------------------------------*/
+
+#lookup-container {
+  min-height: 600px;
+}
+
+.twitter-typeahead {
+  width: 100%;
+}
+
+.tt-dataset-locations {
+  padding-top: 10px;
+  padding-left: 12px;
+}

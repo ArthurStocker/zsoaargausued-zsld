@@ -1,0 +1,284 @@
+{
+	"info": {
+		"_postman_id": "038ac78d-6315-4b1f-b51d-cf93d82780af",
+		"name": "ZSLD Map API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "kp",
+			"item": [
+				{
+					"name": "https://kp.zso-aargausued.ch:8443/map/api/read/system/settings/4",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://kp.zso-aargausued.ch:8443/map/api/read/system/settings/4",
+							"protocol": "https",
+							"host": [
+								"kp",
+								"zso-aargausued",
+								"ch"
+							],
+							"port": "8443",
+							"path": [
+								"map",
+								"api",
+								"read",
+								"system",
+								"settings",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://kp.zso-aargausued.ch:8443/map/api/read/style/theme/0",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://kp.zso-aargausued.ch:8443/map/api/read/style/theme/0",
+							"protocol": "https",
+							"host": [
+								"kp",
+								"zso-aargausued",
+								"ch"
+							],
+							"port": "8443",
+							"path": [
+								"map",
+								"api",
+								"read",
+								"style",
+								"theme",
+								"0"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "public",
+			"item": [
+				{
+					"name": "https://zso-aargausued.ch/map/api/read?type=style&object=theme&id=0",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://zso-aargausued.ch/map/api/read?type=style&object=theme&id=0",
+							"protocol": "https",
+							"host": [
+								"zso-aargausued",
+								"ch"
+							],
+							"path": [
+								"map",
+								"api",
+								"read"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "style"
+								},
+								{
+									"key": "object",
+									"value": "theme"
+								},
+								{
+									"key": "id",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://zso-aargausued.ch/map/api/read?type=feature&object=settings&id=0",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://zso-aargausued.ch/map/api/read?type=feature&object=settings&id=0",
+							"protocol": "https",
+							"host": [
+								"zso-aargausued",
+								"ch"
+							],
+							"path": [
+								"map",
+								"api",
+								"read"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "feature"
+								},
+								{
+									"key": "object",
+									"value": "settings"
+								},
+								{
+									"key": "id",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://zso-aargausued.ch/map/api/go?move=yourcar&id=21",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://zso-aargausued.ch/map/api/go?move=yourcar&id=21",
+							"protocol": "https",
+							"host": [
+								"zso-aargausued",
+								"ch"
+							],
+							"path": [
+								"map",
+								"api",
+								"go"
+							],
+							"query": [
+								{
+									"key": "move",
+									"value": "yourcar"
+								},
+								{
+									"key": "id",
+									"value": "21"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "mapz",
+			"item": [
+				{
+					"name": "https://www.mapz.com/api/static/data/mapz-example.geojson",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://www.mapz.com/api/static/data/mapz-example.geojson",
+							"protocol": "https",
+							"host": [
+								"www",
+								"mapz",
+								"com"
+							],
+							"path": [
+								"api",
+								"static",
+								"data",
+								"mapz-example.geojson"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GeoAdmin",
+			"item": [
+				{
+					"name": "https://vectortiles.geo.admin.ch/gl-styles/ch.swisstopo.leichte-basiskarte.vt/v006/style.json",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://vectortiles.geo.admin.ch/gl-styles/ch.swisstopo.leichte-basiskarte.vt/v006/style.json",
+							"protocol": "https",
+							"host": [
+								"vectortiles",
+								"geo",
+								"admin",
+								"ch"
+							],
+							"path": [
+								"gl-styles",
+								"ch.swisstopo.leichte-basiskarte.vt",
+								"v006",
+								"style.json"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "GeoAdminAPI3",
+			"item": [
+				{
+					"name": "https://api3.geo.admin.ch/examples/geojson_style_example.json",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api3.geo.admin.ch/examples/geojson_style_example.json",
+							"protocol": "https",
+							"host": [
+								"api3",
+								"geo",
+								"admin",
+								"ch"
+							],
+							"path": [
+								"examples",
+								"geojson_style_example.json"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://api3.geo.admin.ch/examples/geojson_example.json",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api3.geo.admin.ch/examples/geojson_example.json",
+							"protocol": "https",
+							"host": [
+								"api3",
+								"geo",
+								"admin",
+								"ch"
+							],
+							"path": [
+								"examples",
+								"geojson_example.json"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
