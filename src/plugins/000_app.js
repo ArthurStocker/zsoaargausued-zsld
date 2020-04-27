@@ -1,20 +1,3 @@
-/**
- * Allgemeine UI Funktionen und Helper
- * 
- * @todo 
- */
-// Endpunkte setzen
-function setUrl(name, value) {
-  var elRequest = ':input[name=' + name + ']';
-  $(elRequest).val(value);
-}
-
-// Endpunkte lesen
-function getUrl(name) {
-  var elRequest = ':input[name=' + name + ']';
-  return $(elRequest).val();
-}
-
 // Show info message
 function info(msg) {
   var box = '';

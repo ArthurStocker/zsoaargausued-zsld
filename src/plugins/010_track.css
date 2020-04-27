@@ -1,0 +1,39 @@
+/*-------------------------------
+ *            Tracking
+ *-------------------------------*/
+
+
+/* Small devices (phones/tablets, 768px and up) (min-width: 768px) */
+
+@media screen and (max-width: 991px) {
+  #tracking-container {
+    min-height: 1000px;
+  }
+}
+
+
+/* tablets/desktops, 992px and up */
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  #tracking-container {
+    min-height: 1000px;
+  }
+}
+
+
+/* large desktops, 1200px and up */
+
+@media screen and (min-width: 1200px) {
+  #tracking-container {
+    min-height: 600px;
+  }
+}
+
+.twitter-typeahead {
+  width: 100%;
+}
+
+.tt-dataset-persons {
+  padding-top: 10px;
+  padding-left: 12px;
+}

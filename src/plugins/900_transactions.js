@@ -52,6 +52,9 @@ if (new Plugins('transaction')) {
             $("#zsld-transaction-list-" + data.stores[i].name).DataTable({
               ajax: {
                 url: last_url,
+                xhrFields: {
+                  withCredentials: true
+                },
                 dataSrc: 'transactions'
               },
               columns: [
@@ -89,6 +92,6 @@ if (new Plugins('transaction')) {
   Plugins.transaction.resetList = function(e) {
     $('#' + $(this).data('list')).DataTable().ajax.url($(this).data('url')).load();
   }
-}
 
-Plugins.transaction.transactionStores();
+  Plugins.transaction.transactionStores();
+}

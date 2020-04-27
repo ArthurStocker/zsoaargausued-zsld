@@ -2,6 +2,36 @@
  *            DataTable
  *-------------------------------*/
 
+
+/* Small devices (phones/tablets, 768px and up) (min-width: 768px) */
+
+@media screen and (max-width: 991px) {
+  #nav-item-transactions {
+    display: none;
+  }
+}
+
+
+/* tablets/desktops, 992px and up */
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  #nav-item-transactions {
+    display: none;
+  }
+}
+
+
+/* large desktops, 1200px and up */
+
+
+/*
+@media screen and (min-width: 1200px) {
+  #nav-item-transactions {
+    display: none;
+  }
+}
+*/
+
 .tbl-right {
   float: right;
 }

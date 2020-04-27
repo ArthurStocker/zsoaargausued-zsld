@@ -79,7 +79,7 @@ if (new Plugins('track')) {
 
         // Initialize bloodhound
         zsld.ADZS = new Bloodhound({
-          limit: 12,
+          limit: (screen.width < 1200 ? 5 : 12),
           datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
           queryTokenizer: Bloodhound.tokenizers.whitespace,
           remote: {
@@ -115,7 +115,7 @@ if (new Plugins('track')) {
           person.properties.notifymc = $("#zsld-tracking-check-kp-input").is(':checked');
 
           $http_tracking.post(URL_REGISTRATION, JSON.stringify({
-            "rn": person.properties["IPN"],
+            "id": person.properties["IPN"],
             "display": "<b>" + person.properties["Vorname"] + " " + person.properties["Name"] + "</b>",
             "properties": person.properties,
             "forceconcurrentobjects": false,
@@ -295,8 +295,39 @@ if (new Plugins('track')) {
           // update the map when the position changes
           zsld.GEOLOCATION.on('change:position', function() {
             var coordinates = zsld.GEOLOCATION.getPosition();
-            positionFeature.setGeometry(coordinates ?
-              new ol.geom.Point(coordinates) : null);
+            positionFeature.setGeometry(coordinates ? new ol.geom.Point(coordinates) : null);
+
+            var previous = [0, 0];
+            if (zsld.getCookieValue('COORDINATES')) {
+              previous = JSON.parse(zsld.getCookieValue('COORDINATES'));
+            }
+
+            // implement timeing to send to the kp
+            if (NOTIFY_MC == "1" && ((previous[0] == 0 && previous[1] == 0) || (previous[0] + zsld.GEOLOCATION.getAccuracy() < coordinates[0] || previous[0] - zsld.GEOLOCATION.getAccuracy() > coordinates[0] || previous[1] + zsld.GEOLOCATION.getAccuracy() < coordinates[1] || previous[1] - zsld.GEOLOCATION.getAccuracy() > coordinates[1]))) {
+
+              if (previous[0] == 0 && previous[1] == 0) {
+                zsld.COORDINATES = 'COORDINATES=' + JSON.stringify(coordinates) + '; path=/; domain=zso-aargausued.ch; max-age=' + (60 * 60 * 24 * 365 * 100) + '; secure; samesite';
+                document.cookie = zsld.COORDINATES;
+              }
+
+              var url = URL_REGISTRATION.replace(/(register=).*/, 'here=iam');
+              url += '&id=0';
+              $http_location.post(url, JSON.stringify({
+                "id": Math.trunc(coordinates[0]) + "</br>" + Math.trunc(coordinates[1]),
+                "display": "position",
+                "properties": {
+                  "accuracy": zsld.GEOLOCATION.getAccuracy() + ' [m]',
+                  "altitude": zsld.GEOLOCATION.getAltitude() + ' [m]',
+                  "altitudeAccuracy": zsld.GEOLOCATION.getAltitudeAccuracy() + ' [m]',
+                  "heading": zsld.GEOLOCATION.getHeading() + ' [rad]',
+                  "speed": zsld.GEOLOCATION.getSpeed() + ' [m/s]',
+                  "coordinates": coordinates
+                },
+                "forceconcurrentobjects": false,
+                "concurrentobjectsallowed": false
+              }));
+            }
+
           });
 
           // update the HTML page when the position changes
@@ -306,20 +337,6 @@ if (new Plugins('track')) {
             $("#zsld-tracking-altitudeAccuracy").text(zsld.GEOLOCATION.getAltitudeAccuracy() + ' [m]');
             $("#zsld-tracking-heading").text(zsld.GEOLOCATION.getHeading() + ' [rad]');
             $("#zsld-tracking-speed").text(zsld.GEOLOCATION.getSpeed() + ' [m/s]');
-
-            // implement timeing to send to the kp
-            if (NOTIFY_MC == "1") {
-              var url = URL_REGISTRATION.replace(/(register=).*/, 'here=iam');
-              url += '&id=0';
-              $http_location.post(url, JSON.stringify({
-                "accuracy": zsld.GEOLOCATION.getAccuracy() + ' [m]',
-                "altitude": zsld.GEOLOCATION.getAltitude() + ' [m]',
-                "altitudeAccuracy": zsld.GEOLOCATION.getAltitudeAccuracy() + ' [m]',
-                "heading": zsld.GEOLOCATION.getHeading() + ' [rad]',
-                "speed": zsld.GEOLOCATION.getSpeed() + ' [m/s]',
-                "coordinates": zsld.GEOLOCATION.getPosition()
-              }));
-            }
           });
 
           // handle geolocation error
@@ -430,6 +447,9 @@ if (new Plugins('track')) {
       document.cookie = zsld.NOTIFY_MC;
       NOTIFY_MC = zsld.getCookieValue('NOTIFYMC');
     }
+
+    REGISTRATIONDIALOG = zsld.getCookieValue('REGISTRATIONDIALOG');
+    console.debug("REGISTRATIONDIALOG ", REGISTRATIONDIALOG, zsld.getCookieValue('REGISTRATIONDIALOG'));
 
     Plugins.track.deviceTracking();
 

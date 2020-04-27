@@ -1,4 +1,21 @@
 /**
+ * Allgemeine UI Funktionen und Helper
+ * 
+ * @todo 
+ */
+// Endpunkte setzen
+function setUrl(name, value) {
+  var elRequest = ':input[name=' + name + ']';
+  $(elRequest).val(value);
+}
+
+// Endpunkte lesen
+function getUrl(name) {
+  var elRequest = ':input[name=' + name + ']';
+  return $(elRequest).val();
+}
+
+/**
  * Lagedarstellung globale Konfiguration im Script 
  *
  * CODEPEN Config

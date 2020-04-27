@@ -36,6 +36,6 @@ if (new Plugins('settings')) {
     );
     $http_settings_maps.get(URL_GA_SETTINGS);
   }
-}
 
-Plugins.settings.loadMaps();
+  Plugins.settings.loadMaps();
+}

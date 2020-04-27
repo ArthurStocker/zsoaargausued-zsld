@@ -8,6 +8,18 @@
  *
  * @todo
  */
+// Endpunkte setzen
+function setUrl(name, value) {
+  var elRequest = ':input[name=' + name + ']';
+  $(elRequest).val(value);
+}
+
+// Endpunkte lesen
+function getUrl(name) {
+  var elRequest = ':input[name=' + name + ']';
+  return $(elRequest).val();
+}
+
 // Define Application UI API
 var UI = function(n) {
   this.$get = function(n) {

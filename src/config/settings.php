@@ -1,9 +1,11 @@
 <?php
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', true);
 
 define("SYSTEM", "public");
-define("SETTINGS", "/../../../../../../Desktop/ZSO/settings.xlsx");
+define("SETTINGS", "/../../../../../Desktop/ZSO/settings.xlsx");
 
-require_once __DIR__.'/../class/SimpleXLSX.php';
+require_once 'class/SimpleXLSX.php';
 
 if ($xlsx = SimpleXLSX::parse(__DIR__ . SETTINGS)) {
     // Produce array keys from the array values of 1st array element

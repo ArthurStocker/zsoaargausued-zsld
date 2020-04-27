@@ -1,20 +1,20 @@
 <?php
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', true);
+require_once 'class/Style.php';
+require_once 'class/Feature.php';
+require_once 'class/TextSearch.php';
+require_once 'class/SystemProperty.php';
+require_once 'class/ObjectStore.php';
+require_once 'class/TransactionStore.php';
+require_once 'class/SimpleXLSX.php';
 
-require_once __DIR__.'/Style.php';
-require_once __DIR__.'/Feature.php';
-require_once __DIR__.'/TextSearch.php';
-require_once __DIR__.'/SystemProperty.php';
-require_once __DIR__.'/ObjectStore.php';
-require_once __DIR__.'/TransactionStore.php';
-require_once __DIR__.'/SimpleXLSX.php';
 
-include_once('../config/settings.php');
-
-class Rest{
+class Rest {
     
     private $debug;
+
+    function __construct($debug = false) {
+        $this->debug = $debug;
+    }
 
     public function list($filter) {
         $filtered = [];
@@ -42,7 +42,7 @@ class Rest{
     public function create($data, $type, $obj, $id, $concurrent = false) {
         $response = null;
 
-        if ($type === 'device') {
+        if ($type === 'device' || $type === 'iam') {
             $response = ObjectStore::save($data, $type, $id, $concurrent, DATA_PATH . $obj . '.json');
         } else {
             $response = TransactionStore::save($data, $type, $id, $concurrent, DATA_PATH . $obj . '.json');
@@ -100,7 +100,13 @@ class Rest{
 		echo json_encode($response, JSON_PRETTY_PRINT);	
     }
     public function update($data, $type, $obj, $id) {
-        $response = TransactionStore::roll(DATA_PATH . $obj . '.json', $obj . '.json', $obj);
+        if ($type === 'device' || $type === 'iam') {
+            $response = ObjectStore::update($data, $type, $id, DATA_PATH . $obj . '.json');
+        } elseif ($type === 'objectstore') {
+            $response = ObjectStore::roll(DATA_PATH . $obj . '.json', $obj . '.json', $obj);
+        } elseif ($type === 'transaction') {
+            $response = TransactionStore::roll(DATA_PATH . $obj . '.json', $obj . '.json', $obj);
+        }
         if ( $response ) {
             return $response;
         }

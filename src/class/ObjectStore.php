@@ -28,21 +28,21 @@ class ObjectStore {
                 
         return $htic;
     }
-    private function _add($data, $type, $id, $concurrent = false) {
+    private function _add($data, $type, $oid, $concurrent = false) {
         $state = true;
 
-        if ( !$concurrent) {
+        if ( !$concurrent ) {
             foreach ($this->records as $row) {
-                if ($row['type'] === $type && $row['oid'] === $id) {
+                if ($row['id'] === $data->id && $row['type'] === $type && $row['oid'] === $oid) {
                     $state = $row['concurrentobjectsallowed']; 
                 }
             }
         }
         
         $object = new stdClass();
-        $object->id = $data->rn;
+        $object->id = $data->id;
         $object->tic = $this->_createTIC();
-        $object->oid = $id;
+        $object->oid = $oid;
         $object->type = $type;
         $object->data = $data->display;
         $object->properties = $data->properties;
@@ -63,6 +63,40 @@ class ObjectStore {
             $this->records[] = (array)$object;
         } else {
             $this->error(409, 'Transaction failed, object allready registered!');
+        }
+    }
+    private function _set($data, $type, $oid) {
+        $state = false;
+
+        foreach ($this->records as $id => $row) {
+            if ($row['type'] === $type && $row['oid'] === $oid) {
+                $state = true; 
+             }
+        }
+        
+        if ( $state ) {
+
+            $this->records[$id]['id'] = $data->id;
+            //$this->records[$id]['tic'] = $this->_createTIC();
+            //$this->records[$id]['oid'] = $oid;
+            //$this->records[$id]['type'] = $type;
+            $this->records[$id]['data'] = $data->display;
+            $this->records[$id]['properties'] = $data->properties;
+            $this->records[$id]['concurrentobjectsallowed'] = $data->concurrentobjectsallowed;
+            //$this->records[$id]['valid'] = date(DATE_ATOM);
+            $this->records[$id]['decision'] = date(DATE_ATOM);
+            $this->records[$id]['transaction'] = date(DATE_ATOM);
+
+            if (defined("DEVICE_TAC")) {
+                $this->records[$id]['executingdevice'] = constant("DEVICE_TAC");
+            } else {
+                $this->records[$id]['executingdevice'] = '';
+            }
+
+            $this->transaction = (array)$this->records[$id];
+            
+        } else {
+            $this->error(409, 'Transaction failed, object not found!');
         }
     }
     private function _get($id) {
@@ -150,16 +184,55 @@ class ObjectStore {
 
 		return false;
     }
-    public static function save($data, $type, $id, $concurrent = false, $filename, $debug = false) {
+    public static function save($data, $type, $oid, $concurrent = false, $filename, $debug = false) {
 		$store = new self();
         $store->debug = $debug;
         if ( file_exists($filename) ) {
 			$store->_parse($filename);
         }
         if ( $store->success() ) {
-            $object = json_decode($data);
+            if ( $data === "here") {
+                $object = new stdClass();
+                $object->display = "check-in";
+            } else {
+                $object = json_decode($data);
+            }
+            
             if ( gettype($object) === "object") {
-                $store->_add($object, $type, $id, ($concurrent || $object->forceconcurrentobjects));
+                $store->_add($object, $type, $oid, ($concurrent || $object->forceconcurrentobjects));
+            } else {
+                $store->error(3, 'Transaction failed! Wrong data type sent. Expecting JSON data in body.');
+            }
+        }
+        if ($store->success() && !file_put_contents($filename, json_encode($store->records, JSON_PRETTY_PRINT))) {
+            $store->error(3, 'Transaction failed! Error writing transaction, try again or call MISSION CONTROL CENTER.');
+        }
+		//if ( $store->success() ) {
+            $store->transaction['errno'] = $store->errno;
+            $store->transaction['error'] = $store->error;
+			return $store->transaction;
+		//}
+		self::parseError( $store->error() );
+		self::parseErrno( $store->errno() );
+
+		return false;
+    }
+    public static function update($data, $type, $oid, $filename, $debug = false) {
+		$store = new self();
+        $store->debug = $debug;
+        if ( file_exists($filename) ) {
+			$store->_parse($filename);
+        }
+        if ( $store->success() ) {
+            if ( $data === "here") {
+                $object = new stdClass();
+                $object->display = "check-out";
+            } else {
+                $object = json_decode($data);
+            }
+            
+            if ( gettype($object) === "object") {
+                $store->_set($object, $type, $oid);
             } else {
                 $store->error(3, 'Transaction failed! Wrong data type sent. Expecting JSON data in body.');
             }

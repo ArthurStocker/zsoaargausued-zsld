@@ -166,12 +166,7 @@ class TransactionStore {
 			$store->_parse($filename);
         }
         if ( $store->success() ) {
-            if ( $data !== "here") {
-                $object = json_decode($data);
-            } else {
-                $object = $data;
-            }
-            $store->_add($object, $type, $id, $concurrent); 
+            $store->_add($data, $type, $id, $concurrent); 
         }
         if ($store->success() && !file_put_contents($filename, json_encode($store->records, JSON_PRETTY_PRINT))) {
             $store->error(3, 'Transaction failed! Error writing transaction, try again or call MISSION CONTROL CENTER.');

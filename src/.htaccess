@@ -1,0 +1,12 @@
+#RewriteRule ^.*login$ login?PHP_AUTH_DIGEST_RAW=%{HTTP:Authorization} [NC,L]
+#RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+#SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+    
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} ^(.*login)
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak|xlsx)$">
+	Order Allow,Deny
+	Deny from all
+</FilesMatch>

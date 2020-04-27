@@ -1,36 +1,17 @@
 <?php
-include_once('../config/zsldtac.php');
+chdir("..");
 
-ZSLDTAC::build(TRUE);
+require_once 'class/DeviceTAC.php';
 
-// array holding allowed Origin domains
-$allowedOrigins = array(
-    '(http(s)://)?(www\.)?zso-aargausued\.ch',
-	'(http(s)://)?(www\.)?codepen\.io',
-	'(http(s)://)?(www\.)?cdpn\.io',
-);
-   
-if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] != '') {
-	foreach ($allowedOrigins as $allowedOrigin) {
-		if (preg_match('#' . $allowedOrigin . '#', $_SERVER['HTTP_ORIGIN'])) {
-			header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-			header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
-			header('Access-Control-Max-Age: 1000');
-			header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
-			header('Access-Control-Allow-Credentials: true');
-			break;
-		}
-	}
-}
+DeviceTAC::build(TRUE, "GET, PUT, POST, DELETE, OPTIONS");
 
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
 
-$requestMethod = $_SERVER["REQUEST_METHOD"];
-include('../class/Rest.php');
+require_once 'class/Rest.php';
+
 $api = new Rest();
 
+
+$requestMethod = $_SERVER["REQUEST_METHOD"];
 
 switch($requestMethod) {
 	case 'GET':
@@ -52,7 +33,7 @@ switch($requestMethod) {
 		break;
 	case 'POST':
 		if (array_key_exists('here', $_GET) && isset($_GET['id']) && defined("DEVICE_TAC")) {
-			$transaction = $api->create(file_get_contents("php://input"), (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), (int)$_GET['id'], true);
+			$transaction = $api->create(file_get_contents("php://input"), (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), constant("DEVICE_TAC"), true);
 		} elseif (array_key_exists('register', $_GET) && defined("DEVICE_TAC")) {
 			$transaction = $api->create(file_get_contents("php://input"), (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), constant("DEVICE_TAC"));
 		}

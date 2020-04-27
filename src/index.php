@@ -1,17 +1,17 @@
 <?php
-require_once 'class/ObjectStore.php';
+require_once 'class/DeviceTAC.php';
 
-include_once('config/zsldtac.php');
+DeviceTAC::build(TRUE, "GET");
 
-ZSLDTAC::build(TRUE);
 
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
+require_once 'config/setup.php';
+require_once 'config/ui.php';
 
-include_once('config/settings.php');
+$setup = new Setup();
+$ui = new UI();
 
-if (constant("ERROR")) {
+
+if (defined("ERROR")) {
 
 } else {
 ?>
@@ -19,9 +19,6 @@ if (constant("ERROR")) {
 <html lang="en">
 
     <head>
-        <?php 
-            header("Access-Control-Allow-Origin: *");
-        ?>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link rel="manifest" href="<?php echo MANIFEST;?>">
         <link rel="apple-touch-icon" sizes="180x180" href="<?php echo ICON_APPLE;?>">
@@ -67,6 +64,7 @@ if (constant("ERROR")) {
             }
         ?>
         <title>ZSO aargauSüd - Lagedarstellung</title>
+        <?php $setup->worker();?>
     </head>
 
     <body>
@@ -82,7 +80,7 @@ if (constant("ERROR")) {
         <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
         <script src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
         <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
-        <?php include('config/worker.php');?>
+        <?php $ui->init();?>
 
         <!-- Warper -->
         <div id="wrapper">

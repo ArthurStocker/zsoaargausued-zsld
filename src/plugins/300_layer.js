@@ -88,6 +88,6 @@ if (new Plugins('layer')) {
     $("#zsld-layers").empty();
     Plugins.layer.loadMaps();
   };
-}
 
-Plugins.layer.loadMaps();
+  Plugins.layer.loadMaps();
+}
