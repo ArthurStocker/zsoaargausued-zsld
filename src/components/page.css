@@ -5,12 +5,12 @@
 #page-content-wrapper {
   width: 100%;
   height: 100%;
-  /*padding-top: 70px;*/
+  /*padding-top: 4.25em;*/
 }
 
 #wrapper.toggled #page-content-wrapper {
   position: absolute;
-  margin-right: -220px;
+  margin-right: -10em;
 }
 
 
@@ -22,11 +22,11 @@
   position: absolute;
   top: .5em;
   left: .6em;
-  width: 54px;
-  height: 54px;
+  width: 3.25em;
+  height: 3.25em;
   z-index: 999;
-  padding: 4px;
-  border-radius: 8px;
+  padding: 0.25em;
+  border-radius: 0.5em;
 }
 
 .menu-toggle:hover {
@@ -35,13 +35,13 @@
 
 .hamburger {
   position: relative;
-  top: 2px;
-  left: 2px;
-  width: 42px;
-  height: 42px;
+  top: 0.125em;
+  left: 0.125em;
+  width: 2.52m;
+  height: 2.25em;
   border: none;
-  padding: 0px;
-  border-radius: 4px;
+  padding: 0em;
+  border-radius: 0.25em;
   background: #33333380;
 }
 
@@ -56,9 +56,9 @@
   content: '';
   display: block;
   width: 100%;
-  font-size: 14px;
+  font-size: 1em;
   color: #fff;
-  line-height: 32px;
+  line-height: 2em;
   text-align: center;
   opacity: 0;
   -webkit-transform: translate3d(0, 0, 0);
@@ -79,9 +79,9 @@
 .hamburger.is-open .hamb-middle,
 .hamburger.is-open .hamb-bottom {
   position: absolute;
-  left: 5px;
-  right: 5px;
-  height: 4px;
+  left: 0.25em;
+  right: 0.25em;
+  height: 0.25em;
   width: auto;
 }
 
@@ -93,17 +93,17 @@
 }
 
 .hamburger.is-closed .hamb-top {
-  top: 10px;
+  top: 0.75em;
   -webkit-transition: all .35s ease-in-out;
 }
 
 .hamburger.is-closed .hamb-middle {
   top: 50%;
-  margin-top: -2px;
+  margin-top: -0.125em;
 }
 
 .hamburger.is-closed .hamb-bottom {
-  bottom: 10px;
+  bottom: 0.75em;
   -webkit-transition: all .35s ease-in-out;
 }
 
@@ -126,7 +126,7 @@
 .hamburger.is-open .hamb-top,
 .hamburger.is-open .hamb-bottom {
   top: 50%;
-  margin-top: -2px;
+  margin-top: -0.125em;
 }
 
 .hamburger.is-open .hamb-top {
@@ -147,9 +147,9 @@
   content: '';
   display: block;
   width: 100%;
-  font-size: 14px;
+  font-size: 1em;
   color: #fff;
-  line-height: 32px;
+  line-height: 2em;
   text-align: center;
   opacity: 0;
   -webkit-transform: translate3d(0, 0, 0);
@@ -171,7 +171,7 @@
 .container-fluid {
   width: 100%;
   height: 100%;
-  padding: 0px;
+  padding: 0em;
 }
 
 
@@ -202,5 +202,5 @@
  *-------------------------------*/
 
 .popover {
-  min-width: 600px;
+  min-width: 40em;
 }

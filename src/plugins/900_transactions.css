@@ -38,11 +38,11 @@
 
 .tbl-right-p50 {
   float: right;
-  padding-right: 50px;
+  padding-right: 3em;
 }
 
 .tab-content {
-  padding: 10px;
+  padding: 0.75em;
   border-left: solid 1px #ddd;
   border-right: solid 1px #ddd;
   border-bottom: solid 1px #ddd;

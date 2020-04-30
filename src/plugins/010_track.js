@@ -10,15 +10,15 @@ if (new Plugins('track')) {
       if (REGISTERED_DEVICE < 2) {
         var identification = '';
         identification += '    <div class="row">';
-        identification += '        <div class="col-xs-6 col-md-4">Geräte Identifikation</div>';
-        identification += '        <div id="zsld-tracking-registration" class="col-xs-12 col-md-8">erfolgreich</div>';
+        identification += '        <div class="col-xs-4 col-md-4">Geräte Identifikation</div>';
+        identification += '        <div id="zsld-tracking-registration" class="col-xs-8 col-md-8">erfolgreich</div>';
         identification += '    </div>';
         $("#zsld-tracking-success").append(identification);
 
         var information = '';
         information += '    <div class="row">';
-        information += '        <div class="col-xs-6 col-md-4">Geräte ID</div>';
-        information += '        <div id="zsld-tracking-device" class="col-xs-12 col-md-8">******************</div>';
+        information += '        <div class="col-xs-4 col-md-4">Geräte ID</div>';
+        information += '        <div id="zsld-tracking-device" class="col-xs-8 col-md-8">******************</div>';
         information += '    </div>';
         $("#zsld-tracking-information").append(information);
       }
@@ -36,8 +36,8 @@ if (new Plugins('track')) {
 
           var registration = '';
           registration += '    <div class="row">';
-          registration += '        <div class="col-xs-6 col-md-4">Geräte Registration</div>';
-          registration += '        <div id="zsld-tracking-registration" class="col-xs-12 col-md-8">' + device.data + '</div>';
+          registration += '        <div class="col-xs-4 col-md-4">Geräte Registration</div>';
+          registration += '        <div id="zsld-tracking-registration" class="col-xs-8 col-md-8">' + device.data + '</div>';
           registration += '    </div>';
           $('#zsld-tracking-success').html(registration);
 
@@ -60,8 +60,8 @@ if (new Plugins('track')) {
 
           var registration = '';
           registration += '    <div class="row">';
-          registration += '        <div class="col-xs-6 col-md-4">Geräte Registration</div>';
-          registration += '        <div id="zsld-tracking-registration" class="col-xs-12 col-md-8">Fehler bei der Registration deines Gerätes</div>';
+          registration += '        <div class="col-xs-4 col-md-4">Geräte Registration</div>';
+          registration += '        <div id="zsld-tracking-registration" class="col-xs-8 col-md-8">Fehler bei der Registration deines Gerätes</div>';
           registration += '    </div>';
           $('#zsld-tracking-error').html(registration);
 
@@ -136,8 +136,8 @@ if (new Plugins('track')) {
 
       var identification = '';
       identification += '    <div class="row">';
-      identification += '        <div class="col-xs-6 col-md-4">Geräte Identifikation</div>';
-      identification += '        <div id="zsld-tracking-identification" class="col-xs-12 col-md-8">Fehler bei der Identifikation deines Gerätes</div>';
+      identification += '        <div class="col-xs-4 col-md-4">Geräte Identifikation</div>';
+      identification += '        <div id="zsld-tracking-identification" class="col-xs-8 col-md-8">Fehler bei der Identifikation deines Gerätes</div>';
       identification += '    </div>';
       $('#zsld-tracking-error').html(identification);
     }
@@ -152,8 +152,8 @@ if (new Plugins('track')) {
       //$("#zsld-tracking-status").append(status);
       var locating = '';
       locating += '    <div class="row">';
-      locating += '        <div class="col-xs-6 col-md-4">Geolocation Service</div>';
-      locating += '        <div id="zsld-tracking-locating" class="col-xs-12 col-md-8">Gerät lokalisieren … </div>';
+      locating += '        <div class="col-xs-4 col-md-4">Geolocation Service</div>';
+      locating += '        <div id="zsld-tracking-locating" class="col-xs-8 col-md-8">Gerät lokalisieren … </div>';
       locating += '    </div>';
       $('#zsld-tracking-success').html(locating);
 
@@ -172,31 +172,31 @@ if (new Plugins('track')) {
 
           var location = '';
           location += '    <div class="row">';
-          location += '        <div class="col-xs-6 col-md-4">Geräte Verfolgung</div>';
-          location += '        <div id="zsld-tracking-location" class="col-xs-12 col-md-8">Wir konnten dein Gerät erflogreich lokalisieren</div>';
+          location += '        <div class="col-xs-4 col-md-4">Geräte Verfolgung</div>';
+          location += '        <div id="zsld-tracking-location" class="col-xs-8 col-md-8">Wir konnten dein Gerät erflogreich lokalisieren</div>';
           location += '    </div>';
           $('#zsld-tracking-success').html(location);
 
           var information = '';
           information += '    <div class="row">';
-          information += '        <div class="col-xs-6 col-md-4">Accuracy </div>';
-          information += '        <div id="zsld-tracking-accuracy" class="col-xs-12 col-md-8"></div>';
+          information += '        <div class="col-xs-4 col-md-4">Accuracy </div>';
+          information += '        <div id="zsld-tracking-accuracy" class="col-xs-8 col-md-8"></div>';
           information += '    </div>';
           information += '    <div class="row">';
-          information += '        <div class="col-xs-6 col-md-4">Altitude </div>';
-          information += '        <div id="zsld-tracking-altitude" class="col-xs-12 col-md-8"></div>';
+          information += '        <div class="col-xs-4 col-md-4">Altitude </div>';
+          information += '        <div id="zsld-tracking-altitude" class="col-xs-8 col-md-8"></div>';
           information += '    </div>';
           information += '    <div class="row">';
-          information += '        <div class="col-xs-6 col-md-4">Altitude accuracy </div>';
-          information += '        <div id="zsld-tracking-altitudeAccuracy" class="col-xs-12 col-md-8"></div>';
+          information += '        <div class="col-xs-4 col-md-4">Altitude accuracy </div>';
+          information += '        <div id="zsld-tracking-altitudeAccuracy" class="col-xs-8 col-md-8"></div>';
           information += '    </div>';
           information += '    <div class="row">';
-          information += '        <div class="col-xs-6 col-md-4">Heading </div>';
-          information += '        <div id="zsld-tracking-heading" class="col-xs-12 col-md-4"></div>';
+          information += '        <div class="col-xs-4 col-md-4">Heading </div>';
+          information += '        <div id="zsld-tracking-heading" class="col-xs-8 col-md-4"></div>';
           information += '    </div>';
           information += '    <div class="row">';
-          information += '        <div class="col-xs-6 col-md-4">Speed </div>';
-          information += '        <div id="zsld-tracking-speed" class="col-xs-12 col-md-8"></div>';
+          information += '        <div class="col-xs-4 col-md-4">Speed </div>';
+          information += '        <div id="zsld-tracking-speed" class="col-xs-8 col-md-8"></div>';
           information += '    </div>';
           $("#zsld-tracking-information").append(information);
 
@@ -207,8 +207,8 @@ if (new Plugins('track')) {
 
               var notifymc = '';
               notifymc += '    <div class="row">';
-              notifymc += '        <div class="col-xs-6 col-md-4">Geräte Standort</div>';
-              notifymc += '        <div id="zsld-tracking-location" class="col-xs-12 col-md-8">wurde ans KP gesendet</div>';
+              notifymc += '        <div class="col-xs-4 col-md-4">Geräte Standort</div>';
+              notifymc += '        <div id="zsld-tracking-location" class="col-xs-8 col-md-8">wurde ans KP gesendet</div>';
               notifymc += '    </div>';
               $('#zsld-tracking-success').html(notifymc);
             },
@@ -218,8 +218,8 @@ if (new Plugins('track')) {
 
               var notifymc = '';
               notifymc += '    <div class="row">';
-              notifymc += '        <div class="col-xs-6 col-md-4">Geräte Standort</div>';
-              notifymc += '        <div id="zsld-tracking-location" class="col-xs-12 col-md-8">konnte nicht ans KP gesendet werden</div>';
+              notifymc += '        <div class="col-xs-4 col-md-4">Geräte Standort</div>';
+              notifymc += '        <div id="zsld-tracking-location" class="col-xs-8 col-md-8">konnte nicht ans KP gesendet werden</div>';
               notifymc += '    </div>';
               $('#zsld-tracking-error').html(notifymc);
             }
@@ -235,7 +235,7 @@ if (new Plugins('track')) {
 
           var tracking = '';
           tracking += '<div id="zsld-tracking-check" class="form-check">';
-          tracking += '    <label for="zsld-tracking-check-label" class="form-check-label">Dein Standandort wird</br>auf der Karte verfolgt </label>';
+          tracking += '    <label for="zsld-tracking-check-label" class="form-check-label">Dein Standandort wird auf der Karte verfolgt </label>';
           tracking += '    <input id="zsld-tracking-check-input" class="form-check-input" type="checkbox" value="trackme" ' + (TRACK_ME == '1' ? 'checked' : '') + '>';
           tracking += '</div>';
           $("#zsld-tracking-warning").append(tracking);
@@ -247,12 +247,12 @@ if (new Plugins('track')) {
           $("#zsld-tracking-check-input").change(function() {
             zsld.GEOLOCATION.setTracking($(this).is(':checked'));
             if ($(this).is(':checked')) {
-              $("#zsld-tracking-check-label").text('Dein Standandort wird</br>auf der Karte verfolgt ');
+              $("#zsld-tracking-check-label").text('Dein Standandort wird auf der Karte verfolgt ');
               zsld.TRACK_ME = 'TRACKME=1; path=/; domain=zso-aargausued.ch; max-age=' + (60 * 60 * 24 * 365 * 100) + '; secure; samesite';
               document.cookie = zsld.TRACK_ME;
               TRACK_ME = zsld.getCookieValue('TRACKME');
             } else {
-              $("#zsld-tracking-check-label").text('Ich möchte meinen Standort</br>auf der Karte verfolgen ');
+              $("#zsld-tracking-check-label").text('Ich möchte meinen Standort auf der Karte verfolgen ');
               zsld.TRACK_ME = 'TRACKME=0; path=/; domain=zso-aargausued.ch; max-age=' + (60 * 60 * 24 * 365 * 100) + '; secure; samesite';
               document.cookie = zsld.TRACK_ME;
               TRACK_ME = zsld.getCookieValue('TRACKME');
@@ -261,19 +261,19 @@ if (new Plugins('track')) {
 
           var notification = '';
           notification += '<div id="zsld-tracking-check-kp" class="form-check">';
-          notification += '    <label for="zsld-tracking-check-kp-label" class="form-check-label">Dein Standandort wird</br>regelmässig dem KP mitgeteilt </label>';
+          notification += '    <label for="zsld-tracking-check-kp-label" class="form-check-label">Dein Standandort wird regelmässig dem KP mitgeteilt </label>';
           notification += '    <input id="zsld-tracking-check-kp-input" class="form-check-input" type="checkbox" value="trackme" ' + (NOTIFY_MC == '1' ? 'checked' : '') + '>';
           notification += '</div>';
           $("#zsld-tracking-warning").append(notification);
 
           $("#zsld-tracking-check-kp-input").change(function() {
             if ($(this).is(':checked')) {
-              $("#zsld-tracking-check-kp-label").text('Dein Standandort wird</br>egelmässig dem KP mitgeteilt ');
+              $("#zsld-tracking-check-kp-label").text('Dein Standandort wird egelmässig dem KP mitgeteilt ');
               zsld.NOTIFY_MC = 'NOTIFYMC=1; path=/; domain=zso-aargausued.ch; max-age=' + (60 * 60 * 24 * 365 * 100) + '; secure; samesite';
               document.cookie = zsld.NOTIFY_MC;
               NOTIFY_MC = zsld.getCookieValue('NOTIFYMC');
             } else {
-              $("#zsld-tracking-check-kp-label").text('Ich möchte meinen Standort</br>regelmässig dem KP mitteilen ');
+              $("#zsld-tracking-check-kp-label").text('Ich möchte meinen Standort regelmässig dem KP mitteilen ');
               zsld.NOTIFY_MC = 'NOTIFYMC=0; path=/; domain=zso-aargausued.ch; max-age=' + (60 * 60 * 24 * 365 * 100) + '; secure; samesite';
               document.cookie = zsld.NOTIFY_MC;
               NOTIFY_MC = zsld.getCookieValue('NOTIFYMC');
@@ -387,8 +387,8 @@ if (new Plugins('track')) {
           //$("#zsld-tracking-status").append(status);
           var location = '';
           location += '    <div class="row">';
-          location += '        <div class="col-xs-6 col-md-4">Device tracking</div>';
-          location += '        <div id="zsld-tracking-location" class="col-xs-12 col-md-8">Error attempting to retrieve your location</div>';
+          location += '        <div class="col-xs-4 col-md-4">Device tracking</div>';
+          location += '        <div id="zsld-tracking-location" class="col-xs-8 col-md-8">Error attempting to retrieve your location</div>';
           location += '    </div>';
           $('#zsld-tracking-error').html(location);
         });
@@ -400,8 +400,8 @@ if (new Plugins('track')) {
       //$("#zsld-tracking-status").append(status);
       var locating = '';
       locating += '    <div class="row">';
-      locating += '        <div class="col-xs-6 col-md-4">Geolocation service</div>';
-      locating += '        <div id="zsld-tracking-locating" class="col-xs-12 col-md-8">Geolocation is not supported by your browser</div>';
+      locating += '        <div class="col-xs-4 col-md-4">Geolocation service</div>';
+      locating += '        <div id="zsld-tracking-locating" class="col-xs-8 col-md-8">Geolocation is not supported by your browser</div>';
       locating += '    </div>';
       $('#zsld-tracking-error').html(locating);
     }

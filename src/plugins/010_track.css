@@ -7,7 +7,7 @@
 
 @media screen and (max-width: 991px) {
   #tracking-container {
-    min-height: 1000px;
+    min-height: 50em;
   }
 }
 
@@ -16,7 +16,7 @@
 
 @media (min-width: 992px) and (max-width: 1199px) {
   #tracking-container {
-    min-height: 1000px;
+    min-height: 50em;
   }
 }
 
@@ -25,7 +25,7 @@
 
 @media screen and (min-width: 1200px) {
   #tracking-container {
-    min-height: 600px;
+    min-height: 36em;
   }
 }
 
@@ -34,6 +34,6 @@
 }
 
 .tt-dataset-persons {
-  padding-top: 10px;
-  padding-left: 12px;
+  padding-top: 0.75em;
+  padding-left: 0.75em;
 }

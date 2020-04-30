@@ -3,10 +3,10 @@
  *-------------------------------*/
 
 .editor-form {
-  margin-top: 5px;
+  margin-top: 0.25em;
 }
 
 .editor-content {
-  min-height: 300px;
+  min-height: 18em;
   resize: none;
 }

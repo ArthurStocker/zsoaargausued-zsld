@@ -8,6 +8,12 @@
  *
  * @todo
  */
+$(document).on('focusin focusout', 'input, select, textarea', function(e) {
+  $('meta[name=viewport]').remove();
+  $('head').append('<meta name="viewport" content="initial-scale=0.5, maximum-scale=1, user-scalable=' + (e.type == 'focusout' ? 1 : 0) + '">');
+  $(window).resize();
+});
+
 // Endpunkte setzen
 function setUrl(name, value) {
   var elRequest = ':input[name=' + name + ']';

@@ -3,7 +3,7 @@
  *-------------------------------*/
 
 #lookup-container {
-  min-height: 600px;
+  min-height: 36em;
 }
 
 .twitter-typeahead {
@@ -11,6 +11,6 @@
 }
 
 .tt-dataset-locations {
-  padding-top: 10px;
-  padding-left: 12px;
+  padding-top: 0.75em;
+  padding-left: 0.75em;
 }

@@ -4,10 +4,10 @@
 
 #sidebar-wrapper {
   z-index: 1000;
-  left: 220px;
+  left: 10em;
   width: 0;
   height: 100%;
-  margin-left: -220px;
+  margin-left: -10em;
   overflow-y: auto;
   overflow-x: hidden;
   background: #1a1a1a;
@@ -22,7 +22,7 @@
 }
 
 #wrapper.toggled #sidebar-wrapper {
-  width: 220px;
+  width: 10em;
 }
 
 
@@ -33,7 +33,7 @@
 .sidebar-nav {
   position: absolute;
   top: 0;
-  width: 220px;
+  width: 10em;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -79,7 +79,7 @@
   left: 0;
   z-index: -1;
   height: 100%;
-  width: 3px;
+  width: 0.125em;
   background-color: #1c1c1c;
   -webkit-transition: width .2s ease-in;
   -moz-transition: width .2s ease-in;
@@ -165,7 +165,7 @@
   display: block;
   color: #ddd;
   text-decoration: none;
-  padding: 10px 15px 10px 22px;
+  padding: 0.75em 1em 0.75em 1.25em;
 }
 
 .sidebar-nav li a:hover,
@@ -180,9 +180,9 @@
 }
 
 .sidebar-nav>.sidebar-brand {
-  height: 65px;
-  font-size: 24px;
-  line-height: 44px;
+  height: 4em;
+  font-size: 1em;
+  line-height: 0.125em;
 }
 
 .sidebar-nav .dropdown-menu {

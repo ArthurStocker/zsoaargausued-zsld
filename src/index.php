@@ -19,6 +19,7 @@ if (defined("ERROR")) {
 <html lang="en">
 
     <head>
+        <meta name="viewport" content="initial-scale=0.5, maximum-scale=1, user-scalable=1">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <link rel="manifest" href="<?php echo MANIFEST;?>">
         <link rel="apple-touch-icon" sizes="180x180" href="<?php echo ICON_APPLE;?>">

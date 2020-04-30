@@ -62,9 +62,9 @@ self.addEventListener('activate', event => {
   console.log('Service worker activating...');
 });
 
-self.addEventListener('fetch', event => {
-  console.log('Service worker fetching request: ', event.request.url);
-});
+//self.addEventListener('fetch', event => {
+//  console.log('Service worker fetching request: ', event.request.url);
+//});
 <?php
     }
 }
