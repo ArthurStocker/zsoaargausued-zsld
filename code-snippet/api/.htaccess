@@ -1,2 +1,0 @@
-RewriteEngine On    # Turn on the rewriting engine
-RewriteRule ^read/([a-z]*)/([0-9a-zA-Z_-]*)/([0-9]*)$ read.php?type=$1&object=$2&id=$3 [NC,L]
