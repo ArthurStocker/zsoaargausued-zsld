@@ -1,0 +1,87 @@
+{
+  "done": [],
+  "in-progress": [
+    {
+      "assignedTo": {
+        "name": "arthur"
+      },
+      "category": "usability",
+      "creation_time": "2020-04-30T18:39:25.420Z",
+      "description": {
+        "content": "requests to the data and login api shoud be secured.\n1. not registered devices are permited to read/write data for 180 sec (configurable), register as unknow after timeout\n2. only registered devices are permited to read/write data for a individual period\n3. grants to users are configurable and get disabled after individual timeout",
+        "mime": "text/markdown"
+      },
+      "id": "3",
+      "prio": 1,
+      "references": [],
+      "title": "secure read/write requests"
+    }
+  ],
+  "testing": [
+    {
+      "assignedTo": {
+        "name": "arthur"
+      },
+      "category": "usability",
+      "creation_time": "2020-04-30T18:25:57.396Z",
+      "description": {
+        "content": "Time to load the map and moving on the map is slow and lead to crashes.\n(maybe hide maps on load by default?)",
+        "mime": "text/markdown"
+      },
+      "id": "2",
+      "prio": 2,
+      "references": [],
+      "title": "loading time and smooth scrolling on Samsung Android devices",
+      "type": "bug"
+    },
+    {
+      "assignedTo": {
+        "name": "arthur"
+      },
+      "category": "usability",
+      "creation_time": "2020-04-30T18:23:52.541Z",
+      "description": {
+        "content": "Dialog stays zoomed after focusout on input, select, textarea.",
+        "mime": "text/markdown"
+      },
+      "id": "1",
+      "prio": 1,
+      "references": [],
+      "title": "zoom on mobile devices",
+      "type": "bug"
+    }
+  ],
+  "todo": [
+    {
+      "assignedTo": {
+        "name": "arthur"
+      },
+      "category": "usability",
+      "creation_time": "2020-04-30T18:41:56.509Z",
+      "description": {
+        "content": "1. link car transaction with driver (transaction->device->user)\n2. report car transaction history\n3. report by car and driver",
+        "mime": "text/markdown"
+      },
+      "id": "4",
+      "prio": 2,
+      "references": [],
+      "title": "reports on different transactions"
+    },
+    {
+      "assignedTo": {
+        "name": "arthur"
+      },
+      "category": "ui",
+      "creation_time": "2020-05-01T12:52:24.836Z",
+      "description": {
+        "content": "The menu item transactions is not allways visible \n-> ex. in the desktop browser {gmü}, int the mobile browser (Android) {tke}",
+        "mime": "text/markdown"
+      },
+      "id": "5",
+      "prio": 2,
+      "references": [],
+      "title": "service \"transactions\" not allways visible in the ui",
+      "type": "bug"
+    }
+  ]
+}

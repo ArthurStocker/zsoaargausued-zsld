@@ -77,15 +77,15 @@ class DeviceTAC {
         header("Pragma: no-cache");
 
     }
-    public static function session( $lifetime = 180 ) { 
+    public static function session( $lifetime = "+180 seconds" ) { 
         session_set_cookie_params ( $lifetime, "/map/", ".zso-aargausued.ch", TRUE, FALSE );
         session_save_path( DATA_PATH );
         session_name( "ZSLDSESSION" );
         session_start();
         self::write( 'device', DEVICE_TAC );
-        self::write( 'valid', date(DATE_ATOM, strtotime( "+" . $lifetime . " seconds", time() ) ) );
+        self::write( 'valid', date(DATE_ATOM, strtotime( $lifetime , time() ) ) );
     }
-    public static function restore($lifetime = (60 * 60)) { 
+    public static function restore( $lifetime = "+3600 seconds" ) { 
         if ( session_status() === 1 ) {
             self::session();
         }
@@ -195,7 +195,7 @@ class DeviceTAC {
             $response = ObjectStore::save( json_encode( $data, JSON_PRETTY_PRINT ), "device", DEVICE_TAC, false, DATA_PATH . DATASTORE_DEVICE . '.json' );
 
             //New device. Data access granted for 180 sec
-            //setcookie( "ZSLDDEBUG", "New device. Data access granted for 180 sec: " . json_encode( $response, JSON_PRETTY_PRINT ), time()+60, "/", "zso-aargausued.ch", false, false);
+            header("ZSLD-DEBUG: " . '{ "error": "<b>Das Gerät wurde in der Geräte-Datenbank nicht gefunden. Neues Gerät, der Zugriff wird für 180 Sekunden gewährt damit eine Registrierung stattfinden kann.</b>" }' );
             self::session();
         } else {
             define( "DEVICE_TAC", $_COOKIE["deviceTAC"] );
@@ -205,14 +205,25 @@ class DeviceTAC {
                 if ( !empty( $response ) && $response[0]['oid'] === DEVICE_TAC /* && $response[0]['id'] === DEVICE_TAC */ && $response[0]['data'] !==  "unbekannt" ) {
                     //Session valid. Data access granted
                     //setcookie( "ZSLDDEBUG", "Session valid. Data access granted ", time()+60, "/", "zso-aargausued.ch", false, false);
+                    
+                    if ( $userdb = ObjectStore::parse( DATA_PATH . DATASTORE_ACCESS . '.json' ) ) {
+                        $users = $userdb->list( 0, array( 'rid' => $response[0]['properties']['IPN'] ) );
+                        if ( !empty( $users ) ) {
+                            header("ZSLD-DEBUG: " . json_encode( $users ) );
+                        } else {
+                            header("ZSLD-DEBUG: " . '{ "error": "<b>Der Benutzer konnte in der Benutzer-Datenbank nicht gefunden werden. Der Zugriff wird verweigert.</b>" }' );
+                        }
+                    } else {
+                        header("ZSLD-DEBUG: " . '{ "error": "<b>Die Benutzer-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert.</b>" }' );
+                    }
                     self::restore();
                 } else {
                     //Device identified but unknown to the backend. Data access prohibited
-                    //setcookie( "ZSLDDEBUG", "Device identified but unknown to the backend. Data access prohibited ", time()+60, "/", "zso-aargausued.ch", false, false);
+                    header("ZSLD-DEBUG: " . '{ "error": "<b>Das Gerät wurde in der Geräte-Datenbank gefunden aber nicht registriert. Der Zugriff wird verweigert.</b>" }' );
                 }
             } else {
                 //Can't parse ObjectStore. Data access prohibited
-                //setcookie( "ZSLDDEBUG", "Can't parse ObjectStore. Data access prohibited ", time()+60, "/", "zso-aargausued.ch", false, false);
+                header("ZSLD-DEBUG: " . '{ "error": "<b>Die Geräte-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert.</b>" }' );
             }
         }
 

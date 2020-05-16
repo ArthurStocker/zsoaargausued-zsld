@@ -13,7 +13,7 @@ if (new Plugins('search')) {
    */
   // Bloodhound suggestion engine initialization 
   zsld.BLOODHOUND = new Bloodhound({
-    limit: 15,
+    limit: 12,
     datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
     queryTokenizer: Bloodhound.tokenizers.whitespace,
     remote: {

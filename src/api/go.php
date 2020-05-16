@@ -20,7 +20,7 @@ switch($requestMethod) {
 		} elseif (array_key_exists('park', $_GET) && isset($_GET['id'])) {
 			$transaction = $api->create('park', (string)$_GET['park'], (string)constant("DATASTORE_" . strtoupper($_GET['park'])), (int)$_GET['id']);
 		} elseif (array_key_exists('here', $_GET) && isset($_GET['id'])) {
-			$transaction = $api->create('here', (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), (int)$_GET['id'], true);
+			$transaction = $api->create('{ "display": "check-in" }', (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), (int)$_GET['id'], true);
 		//} elseif (array_key_exists('show', $_GET) && isset($_GET['show']) && isset($_GET['id'])) {
 		//	$api->read($_GET, 'transaction', (string)constant("DATASTORE_" . strtoupper($_GET['show'])), (int)$_GET['id']);
 		} else {
@@ -33,10 +33,15 @@ switch($requestMethod) {
 		break;
 	case 'POST':
 		if (array_key_exists('here', $_GET) && isset($_GET['id']) && defined("DEVICE_TAC")) {
-			$transaction = $api->create(file_get_contents("php://input"), (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), constant("DEVICE_TAC"), true);
+			$data = file_get_contents("php://input");
+			$transaction = $api->create($data , (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), constant("DEVICE_TAC"), true);
 		} elseif (array_key_exists('register', $_GET) && defined("DEVICE_TAC")) {
-			$transaction = $api->create(file_get_contents("php://input"), (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), constant("DEVICE_TAC"));
-		}
+			$data = file_get_contents("php://input");
+			$transaction = $api->create($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), constant("DEVICE_TAC"));
+		} elseif (array_key_exists('permissions', $_GET) && defined("DEVICE_TAC")) {
+			$data = file_get_contents("php://input");
+			$transaction = $api->create($data, (string)$_GET['permissions'], (string)constant("DATASTORE_" . strtoupper($_GET['permissions'])), json_decode($data)->id);
+		} 
 		if (isset($transaction)) {
 			echo json_encode($transaction, JSON_PRETTY_PRINT);
 			if ($transaction['errno'] === 409) { 

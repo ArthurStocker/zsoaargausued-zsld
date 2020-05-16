@@ -234,7 +234,7 @@ function Query() {
         var params = $http.extend(mapParams, layersParams, geometryParams,
           othersParams);
         var timeo = timeout || {}; // could be an integer or a canceler
-        return $http.get(url, {
+        return $http.get(url, null, {
           timeout: timeo.promise || timeo,
           params: params,
           cache: true
@@ -257,7 +257,7 @@ function processor(data) {
 }
 
 //
-var query = (new Query()).$get(new Rest(processor), GeoAdmin, null);
+var query = (new Query()).$get(new Rest(processor, null, null, false), GeoAdmin, null);
 
 
 

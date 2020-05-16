@@ -27,7 +27,7 @@ if (new Plugins('track')) {
         function(response) {
           var device;
           if (REGISTERED_DEVICE > 0) {
-            device = response.devices[0];
+            device = response.objects[0];
           } else {
             device = JSON.parse(response);
           }
@@ -305,10 +305,10 @@ if (new Plugins('track')) {
             // implement timeing to send to the kp
             if (NOTIFY_MC == "1" && ((previous[0] == 0 && previous[1] == 0) || (previous[0] + zsld.GEOLOCATION.getAccuracy() < coordinates[0] || previous[0] - zsld.GEOLOCATION.getAccuracy() > coordinates[0] || previous[1] + zsld.GEOLOCATION.getAccuracy() < coordinates[1] || previous[1] - zsld.GEOLOCATION.getAccuracy() > coordinates[1]))) {
 
-              if (previous[0] == 0 && previous[1] == 0) {
-                zsld.COORDINATES = 'COORDINATES=' + JSON.stringify(coordinates) + '; path=/; domain=zso-aargausued.ch; max-age=' + (60 * 60 * 24 * 365 * 100) + '; secure; samesite';
-                document.cookie = zsld.COORDINATES;
-              }
+              //if (previous[0] == 0 && previous[1] == 0) {
+              zsld.COORDINATES = 'COORDINATES=' + JSON.stringify(coordinates) + '; path=/; domain=zso-aargausued.ch; max-age=' + (60 * 60 * 24 * 365 * 100) + '; secure; samesite';
+              document.cookie = zsld.COORDINATES;
+              //}
 
               var url = URL_REGISTRATION.replace(/(register=).*/, 'here=iam');
               url += '&id=0';

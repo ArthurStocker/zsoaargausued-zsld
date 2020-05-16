@@ -11,7 +11,10 @@
  * @todo 
  */
 // Rest Class
-var Rest = function(s, e, c) {
+var Rest = function(s, e, c, w) {
+  var configAjax = {
+    withCredentials: true
+  };
   var statusCode = {};
   var success = '';
   var error = '';
@@ -20,20 +23,25 @@ var Rest = function(s, e, c) {
   var url = '';
 
   function request() {
-    $.ajax({
+    var config = {
       url: url,
       type: type,
       data: data,
       success: success,
       error: error,
-      statusCode: statusCode,
-      xhrFields: {
+      statusCode: statusCode
+    };
+
+    if (configAjax.withCredentials) {
+      config.xhrFields = {
         withCredentials: true
-      }
-    });
+      };
+    }
+
+    $.ajax(config);
   }
 
-  this.$get = function(s, e, c) {
+  this.$get = function(s, e, c, w) {
     if (s instanceof Function) {
       success = s;
     } else {
@@ -61,6 +69,10 @@ var Rest = function(s, e, c) {
           failed('REST call redirected');
         }
       }
+    }
+
+    if (w == false) {
+      configAjax.withCredentials = w;
     }
 
     var Endpoint = function() {
@@ -129,5 +141,5 @@ var Rest = function(s, e, c) {
     };
     return new Endpoint();
   };
-  return this.$get(s, e, c);
+  return this.$get(s, e, c, w);
 }

@@ -99,13 +99,34 @@ class ObjectStore {
             $this->error(409, 'Transaction failed, object not found!');
         }
     }
-    private function _get($id) {
+    private function _get($id, $rid, $oid) {
         $filtered = [];
+        $objects = [];
 
         if ((int)$id > -1) {
             foreach ($this->records as $rec) {
-                if (defined("DEVICE_TAC")) {
-                    if ($rec['oid'] === constant("DEVICE_TAC")) {
+                if ( $rid || $oid ) {
+                    $found = false;
+                    if ($rid && $rec['id'] === $rid) {
+                        $found = true;
+                    }
+                    if ($oid && $rec['oid'] === $oid) {
+                        $found = true;
+                    }
+                    if ($found) {
+                        $objects[$rec['id']][] = $rec;
+                    }
+                } else {
+                    $objects[$rec['id']][] = $rec;
+                }
+            }
+
+            foreach ($objects as $object) {
+                
+                usort($object, function($a, $b) {return strcmp($b['decision'], $a['decision']);});
+
+                foreach ($object as $row => $rec) {
+                    if ((int)$row === (int)$id) {
                         $filtered[] = $rec;
                     }
                 }
@@ -113,6 +134,19 @@ class ObjectStore {
         } else {
             $filtered = $this->records;
         }
+
+        // if ((int)$id > -1) {
+        //     foreach ($this->records as $rec) {
+        //         if (defined("DEVICE_TAC")) {
+        //             if ($rec['oid'] === constant("DEVICE_TAC")) {
+        //                 $filtered[] = $rec;
+        //             }
+        //         }
+        //     }
+        // } else {
+        //     $filtered = $this->records;
+        // }
+
         return $filtered;
     }
     private function _parse($filename) {
@@ -126,13 +160,22 @@ class ObjectStore {
     }
     private function response() {
         $response = new stdClass();
-        $response->type = 'RegisteredDevices';
-        $response->devices = [];
+        $response->type = 'ObjectStore';
+        $response->objects = [];
 
         return $response;
     }
-    public function list($id) {
-        $filtered = $this->_get($id);
+    public function list($id, $data = false) {
+        $rid = false;
+        $oid = false;
+        if ( $data ) {
+            if ( isset($data['rid']) ) $rid = $data['rid'];
+            if ( isset($data['oid']) ) $oid = $data['oid'];
+        }
+        if ( ( !$data || ( !$rid && !$oid ) ) && defined("DEVICE_TAC") ) {
+            $oid = constant("DEVICE_TAC") ;
+        }
+        $filtered = $this->_get($id, $rid, $oid);
         return $filtered;
     }
     public function success() {
@@ -157,7 +200,7 @@ class ObjectStore {
         $geojson = $store->response();
         
         if ($rows) {
-            $geojson->devices = $rows;
+            $geojson->objects = $rows;
         }
 
         return $geojson;
@@ -191,14 +234,9 @@ class ObjectStore {
 			$store->_parse($filename);
         }
         if ( $store->success() ) {
-            if ( $data === "here") {
-                $object = new stdClass();
-                $object->display = "check-in";
-            } else {
-                $object = json_decode($data);
-            }
+            $object = json_decode($data);
             
-            if ( gettype($object) === "object") {
+            if ( gettype($object) === "object" ) {
                 $store->_add($object, $type, $oid, ($concurrent || $object->forceconcurrentobjects));
             } else {
                 $store->error(3, 'Transaction failed! Wrong data type sent. Expecting JSON data in body.');
@@ -224,12 +262,7 @@ class ObjectStore {
 			$store->_parse($filename);
         }
         if ( $store->success() ) {
-            if ( $data === "here") {
-                $object = new stdClass();
-                $object->display = "check-out";
-            } else {
-                $object = json_decode($data);
-            }
+            $object = json_decode($data);
             
             if ( gettype($object) === "object") {
                 $store->_set($object, $type, $oid);

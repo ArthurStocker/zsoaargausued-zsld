@@ -11,11 +11,11 @@ class UI {
 ?>
 <script>
 <?php 
-    if ($devices = ObjectStore::parse(DATA_PATH . DATASTORE_DEVICE . '.json')) {
-        $data = ObjectStore::build( $devices->list("0") );
+    if ($objects = ObjectStore::parse(DATA_PATH . DATASTORE_DEVICE . '.json')) {
+        $data = ObjectStore::build( $objects->list("0") );
         $registered = 0;
-        if ( !empty($data->devices) && $data->devices[0]['data'] !== "unbekannt" )  {
-            $registered = 0;
+        if ( !empty($data->objects) && $data->objects[0]['data'] !== "unbekannt" )  {
+            $registered = 1;
         }
         define("REGISTERED_DEVICE", $registered);
         echo "\nvar REGISTERED_DEVICE = " . $registered . ";\n";

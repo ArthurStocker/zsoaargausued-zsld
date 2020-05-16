@@ -42,7 +42,7 @@ class Rest {
     public function create($data, $type, $obj, $id, $concurrent = false) {
         $response = null;
 
-        if ($type === 'device' || $type === 'iam') {
+        if ($type === 'access' || $type === 'device' || $type === 'iam') {
             $response = ObjectStore::save($data, $type, $id, $concurrent, DATA_PATH . $obj . '.json');
         } else {
             $response = TransactionStore::save($data, $type, $id, $concurrent, DATA_PATH . $obj . '.json');
@@ -57,7 +57,7 @@ class Rest {
         } elseif ($type === 'objectstore') {
             if (isset($obj)) {
                 if ($objects = ObjectStore::parse(DATA_PATH . $obj . '.json')) {
-                    $response = ObjectStore::build( $objects->list($id) );
+                    $response = ObjectStore::build( $objects->list($id, $data) );
                 } else {
                     $response = ObjectStore::parseError();
                 }
@@ -100,7 +100,7 @@ class Rest {
 		echo json_encode($response, JSON_PRETTY_PRINT);	
     }
     public function update($data, $type, $obj, $id) {
-        if ($type === 'device' || $type === 'iam') {
+        if ($type === 'access' || $type === 'device' || $type === 'iam') {
             $response = ObjectStore::update($data, $type, $id, DATA_PATH . $obj . '.json');
         } elseif ($type === 'objectstore') {
             $response = ObjectStore::roll(DATA_PATH . $obj . '.json', $obj . '.json', $obj);
