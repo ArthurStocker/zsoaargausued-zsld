@@ -72,7 +72,7 @@ class Style {
         $geojson = $self->response();
         $headers = []; // Produce array keys from the array values of 1st array element
 
-        if ($rows) {
+        if (DeviceTAC::isValid() && $rows) {
             foreach ( $rows as $k => $r ) {
                 if ( $k === 0 ) {
                     $headers = $r;

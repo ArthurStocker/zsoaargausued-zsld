@@ -23,7 +23,7 @@ class TextSearch {
         $geojson->options['format'] = json_decode($data['format']);
         $geojson->options['delimiter'] = $data['delimiter'];
 
-        if ($rows) {
+        if (DeviceTAC::isValid() && $rows) {
             foreach ( $rows as $k => $r ) {
                 if ( $k === 0 ) {
                     $headers = $r;

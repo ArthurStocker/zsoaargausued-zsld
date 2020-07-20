@@ -33,7 +33,7 @@ class ObjectStore {
 
         if ( !$concurrent ) {
             foreach ($this->records as $row) {
-                if ($row['id'] === $data->id && $row['type'] === $type && $row['oid'] === $oid) {
+                if ( $row['id'] === $data->id && $row['oid'] === $oid && $row['type'] === $type ) {
                     $state = $row['concurrentobjectsallowed']; 
                 }
             }
@@ -69,7 +69,8 @@ class ObjectStore {
         $state = false;
 
         foreach ($this->records as $id => $row) {
-            if ($row['type'] === $type && $row['oid'] === $oid) {
+            //TODO: compare against TIC 
+            if ( /* $row['tic'] === $data->tic && */ $row['oid'] === $oid && $row['type'] === $type ) {
                 $state = true; 
              }
         }
@@ -99,15 +100,18 @@ class ObjectStore {
             $this->error(409, 'Transaction failed, object not found!');
         }
     }
-    private function _get($id, $rid, $oid) {
+    private function _get($id, $rid, $tic, $oid) {
         $filtered = [];
         $objects = [];
 
         if ((int)$id > -1) {
             foreach ($this->records as $rec) {
-                if ( $rid || $oid ) {
+                if ( $rid || $tic || $oid ) {
                     $found = false;
                     if ($rid && $rec['id'] === $rid) {
+                        $found = true;
+                    }
+                    if ($tic && $rec['tic'] === $tic) {
                         $found = true;
                     }
                     if ($oid && $rec['oid'] === $oid) {
@@ -134,19 +138,6 @@ class ObjectStore {
         } else {
             $filtered = $this->records;
         }
-
-        // if ((int)$id > -1) {
-        //     foreach ($this->records as $rec) {
-        //         if (defined("DEVICE_TAC")) {
-        //             if ($rec['oid'] === constant("DEVICE_TAC")) {
-        //                 $filtered[] = $rec;
-        //             }
-        //         }
-        //     }
-        // } else {
-        //     $filtered = $this->records;
-        // }
-
         return $filtered;
     }
     private function _parse($filename) {
@@ -167,15 +158,17 @@ class ObjectStore {
     }
     public function list($id, $data = false) {
         $rid = false;
+        $tic = false;
         $oid = false;
         if ( $data ) {
             if ( isset($data['rid']) ) $rid = $data['rid'];
+            if ( isset($data['tic']) ) $tic = $data['tic'];
             if ( isset($data['oid']) ) $oid = $data['oid'];
         }
-        if ( ( !$data || ( !$rid && !$oid ) ) && defined("DEVICE_TAC") ) {
+        if ( ( !isset($data['id']) && !$rid && !$tic && !$oid ) && defined("DEVICE_TAC") ) {
             $oid = constant("DEVICE_TAC") ;
         }
-        $filtered = $this->_get($id, $rid, $oid);
+        $filtered = $this->_get($id, $rid, $tic, $oid);
         return $filtered;
     }
     public function success() {
@@ -199,7 +192,7 @@ class ObjectStore {
         $store = new self();
         $geojson = $store->response();
         
-        if ($rows) {
+        if (DeviceTAC::isValid() && $rows) {
             $geojson->objects = $rows;
         }
 
@@ -230,100 +223,99 @@ class ObjectStore {
     public static function save($data, $type, $oid, $concurrent = false, $filename, $debug = false) {
 		$store = new self();
         $store->debug = $debug;
-        if ( file_exists($filename) ) {
-			$store->_parse($filename);
-        }
-        if ( $store->success() ) {
-            $object = json_decode($data);
-            
-            if ( gettype($object) === "object" ) {
-                $store->_add($object, $type, $oid, ($concurrent || $object->forceconcurrentobjects));
-            } else {
-                $store->error(3, 'Transaction failed! Wrong data type sent. Expecting JSON data in body.');
+        if ( DeviceTAC::isValid() ) {
+            if ( file_exists($filename) ) {
+                $store->_parse($filename);
             }
+            if ( $store->success() ) {
+                $object = json_decode($data);
+                
+                if ( gettype($object) === "object" ) {
+                    $store->_add($object, $type, $oid, ($concurrent || $object->forceconcurrentobjects));
+                } else {
+                    $store->error(3, 'Transaction failed! Wrong data type sent. Expecting JSON data in body.');
+                }
+            }
+            if ($store->success() && !file_put_contents($filename, json_encode($store->records, JSON_PRETTY_PRINT))) {
+                $store->error(3, 'Transaction failed! Error writing transaction, try again or call MISSION CONTROL CENTER.');
+            }
+        } else {
+            $store->error(403, 'Transaction failed! Access prohibited.');
         }
-        if ($store->success() && !file_put_contents($filename, json_encode($store->records, JSON_PRETTY_PRINT))) {
-            $store->error(3, 'Transaction failed! Error writing transaction, try again or call MISSION CONTROL CENTER.');
-        }
-		//if ( $store->success() ) {
-            $store->transaction['errno'] = $store->errno;
-            $store->transaction['error'] = $store->error;
-			return $store->transaction;
-		//}
-		self::parseError( $store->error() );
-		self::parseErrno( $store->errno() );
-
-		return false;
+        $store->transaction['errno'] = $store->errno;
+        $store->transaction['error'] = $store->error;
+        return $store->transaction;
     }
     public static function update($data, $type, $oid, $filename, $debug = false) {
 		$store = new self();
         $store->debug = $debug;
-        if ( file_exists($filename) ) {
-			$store->_parse($filename);
-        }
-        if ( $store->success() ) {
-            $object = json_decode($data);
-            
-            if ( gettype($object) === "object") {
-                $store->_set($object, $type, $oid);
-            } else {
-                $store->error(3, 'Transaction failed! Wrong data type sent. Expecting JSON data in body.');
+        if ( DeviceTAC::isValid() ) {
+            if ( file_exists($filename) ) {
+                $store->_parse($filename);
             }
+            if ( $store->success() ) {
+                $object = json_decode($data);
+                
+                if ( gettype($object) === "object") {
+                    $store->_set($object, $type, $oid);
+                } else {
+                    $store->error(3, 'Transaction failed! Wrong data type sent. Expecting JSON data in body.');
+                }
+            }
+            if ($store->success() && !file_put_contents($filename, json_encode($store->records, JSON_PRETTY_PRINT))) {
+                $store->error(3, 'Transaction failed! Error writing transaction, try again or call MISSION CONTROL CENTER.');
+            }
+        } else {
+            $store->error(403, 'Transaction failed! Access prohibited.');
         }
-        if ($store->success() && !file_put_contents($filename, json_encode($store->records, JSON_PRETTY_PRINT))) {
-            $store->error(3, 'Transaction failed! Error writing transaction, try again or call MISSION CONTROL CENTER.');
-        }
-		//if ( $store->success() ) {
-            $store->transaction['errno'] = $store->errno;
-            $store->transaction['error'] = $store->error;
-			return $store->transaction;
-		//}
-		self::parseError( $store->error() );
-		self::parseErrno( $store->errno() );
-
-		return false;
+        $store->transaction['errno'] = $store->errno;
+        $store->transaction['error'] = $store->error;
+        return $store->transaction;
     }
     public static function roll($filename, $basename, $obj, $debug = false) {
 		$store = new self();
         $store->debug = $debug;
-        if ( file_exists($filename) ) {
-			$store->_parse($filename);
-        }
-        if ( $store->success() ) {
-            if ( extension_loaded('zip') ) {
-                $zip = new ZipArchive();
-                $archive = $obj . '-' . time() . '.zip';
-                if ($zip->open(DATA_PATH . $archive, ZIPARCHIVE::CREATE) !== true) {
-                    $store->error(4, 'Transaction failed! Failed to create ziparchive.');
+        if ( DeviceTAC::isValid() ) {
+            if ( file_exists($filename) ) {
+                $store->_parse($filename);
+            }
+            if ( $store->success() ) {
+                if ( extension_loaded('zip') ) {
+                    $zip = new ZipArchive();
+                    $archive = $obj . '-' . time() . '.zip';
+                    if ($zip->open(DATA_PATH . $archive, ZIPARCHIVE::CREATE) !== true) {
+                        $store->error(4, 'Transaction failed! Failed to create ziparchive.');
+                    } else {
+                        $zip->addFile($filename, $basename);
+                        $zip->close();
+                        unlink($filename);
+                    }
                 } else {
-                    $zip->addFile($filename, $basename);
-                    $zip->close();
-                    unlink($filename);
+                    $store->error(5, 'Transaction failed! ZIP extension not available.');
                 }
+            }
+            if ($store->success() && !file_put_contents($filename, json_encode($store->list(0), JSON_PRETTY_PRINT))) {
+                $store->error(6, 'Transaction failed! Error in rollover transactions, check if rollback is needed.');
+            }
+            if ( $store->success() ) {
+                if(file_exists(DATA_PATH . $archive)) {  
+                    // push to download the zip  
+                    header('Content-type: application/zip');  
+                    header('Content-Disposition: attachment; filename="' . $archive . '"');  
+                    readfile(DATA_PATH . $archive);  
+                    // remove ziparchive 
+                    unlink(DATA_PATH . $archive);  
+                }
+                //return $store->list(0);
             } else {
-                $store->error(5, 'Transaction failed! ZIP extension not available.');
+                return $store->records;
             }
+        } else {
+            $store->error(403, 'Transaction failed! Access prohibited.');
         }
-        if ($store->success() && !file_put_contents($filename, json_encode($store->list(0), JSON_PRETTY_PRINT))) {
-            $store->error(6, 'Transaction failed! Error in rollover transactions, check if rollback is needed.');
-        }
-		if ( $store->success() ) {
-            if(file_exists(DATA_PATH . $archive)) {  
-                 // push to download the zip  
-                 header('Content-type: application/zip');  
-                 header('Content-Disposition: attachment; filename="' . $archive . '"');  
-                 readfile(DATA_PATH . $archive);  
-                 // remove ziparchive 
-                 unlink(DATA_PATH . $archive);  
-            }
-            //return $store->list(0);
-		} else {
-            return $store->records;
-        }
-		self::parseError( $store->error() );
-		self::parseErrno( $store->errno() );
-
-		return false;
+        $store->transaction['errno'] = $store->errno;
+        $store->transaction['error'] = $store->error;
+        return $store->transaction;
     }
 }
 ?>

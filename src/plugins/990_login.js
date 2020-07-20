@@ -26,5 +26,25 @@ if (new Plugins('login')) {
     $http_login.get("/map/login");
   }
 
+  // Toggle login
+  Plugins.login.toggle = function(e) {
+    var icon = $("<i></i>");
+    if (e == "Login") {
+      icon.toggleClass("fas fa-sign-in-alt fa-1x", true);
+    } else {
+      icon.toggleClass("fas fa-sign-out-alt fa-1x", true);
+    }
+    $("#modal-label-login").text(e);
+    $("#nav-action-login").text(" " + e);
+    $("#nav-action-login").prepend(icon);
+    $("#nav-item-login").text("");
+    $("#nav-item-login").prepend(icon.clone());
+  }
+
+  if (!AUTH) {
+    Plugins.login.toggle("Login");
+  } else {
+    Plugins.login.toggle("Logout");
+  }
   $('#modal-login').on('show.bs.modal', Plugins.login.exec);
 }

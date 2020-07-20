@@ -35,7 +35,11 @@ class Rest {
     
         usort($filtered, function($a, $b) {return strcmp($a->fullname, $b->fullname);});
 
-        $response->stores = array_values(array_filter($filtered, function($v) {return $v->show;}));
+        if (DeviceTAC::isValid()) {
+            $response->stores = array_values(array_filter($filtered, function($v) {return $v->show;}));
+        } else {
+            $response->stores = [];
+        }
 
         return $response;
     }
@@ -51,7 +55,6 @@ class Rest {
     }
 	public function read($data, $type, $obj, $id) {
         $response = '';
-
         if ($type === 'list') {
             $response = $this->list($obj);
         } elseif ($type === 'objectstore') {
@@ -87,7 +90,7 @@ class Rest {
                         $response = TextSearch::build( $xlsx->rows($id), $data );
                     }
                     if ($type === 'system') {
-                        $response = SystemProperty::build( $xlsx->rows($id) );
+                        $response = SystemProperty::build( $xlsx->rows($id), ($id == 2) );
                     }
                 } else {
                     $response = SimpleXLSX::parseError();

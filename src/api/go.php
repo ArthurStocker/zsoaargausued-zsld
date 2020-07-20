@@ -38,10 +38,7 @@ switch($requestMethod) {
 		} elseif (array_key_exists('register', $_GET) && defined("DEVICE_TAC")) {
 			$data = file_get_contents("php://input");
 			$transaction = $api->create($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), constant("DEVICE_TAC"));
-		} elseif (array_key_exists('permissions', $_GET) && defined("DEVICE_TAC")) {
-			$data = file_get_contents("php://input");
-			$transaction = $api->create($data, (string)$_GET['permissions'], (string)constant("DATASTORE_" . strtoupper($_GET['permissions'])), json_decode($data)->id);
-		} 
+		}
 		if (isset($transaction)) {
 			echo json_encode($transaction, JSON_PRETTY_PRINT);
 			if ($transaction['errno'] === 409) { 

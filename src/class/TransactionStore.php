@@ -33,12 +33,8 @@ class TransactionStore {
 
         if ( !$concurrent) {
             foreach ($this->records as $row) {
-                if ($row['type'] === $type && $row['id'] === $id) {
-                    if ( gettype($data) === "object") {
-                        $state = true;
-                    } else {
-                        $state = ( $row['data'] !== $data );
-                    }
+                if ($row['id'] === $id && $row['type'] === $type) {
+                    $state = ( $row['data'] !== $data );
                 }
             }
         }
@@ -131,7 +127,7 @@ class TransactionStore {
         $store = new self();
         $geojson = $store->response();
         
-        if ($rows) {
+        if (DeviceTAC::isValid() && $rows) {
             $geojson->transactions = $rows;
         }
 
@@ -162,66 +158,67 @@ class TransactionStore {
     public static function save($data, $type, $id, $concurrent = false, $filename, $debug = false) {
 		$store = new self();
         $store->debug = $debug;
-        if ( file_exists($filename) ) {
-			$store->_parse($filename);
+        if ( DeviceTAC::isValid() ) {
+            if ( file_exists($filename) ) {
+                $store->_parse($filename);
+            }
+            if ( $store->success() ) {
+                $store->_add($data, $type, $id, $concurrent); 
+            }
+            if ($store->success() && !file_put_contents($filename, json_encode($store->records, JSON_PRETTY_PRINT))) {
+                $store->error(3, 'Transaction failed! Error writing transaction, try again or call MISSION CONTROL CENTER.');
+            }
+        } else {
+            $store->error(403, 'Transaction failed! Access prohibited.');
         }
-        if ( $store->success() ) {
-            $store->_add($data, $type, $id, $concurrent); 
-        }
-        if ($store->success() && !file_put_contents($filename, json_encode($store->records, JSON_PRETTY_PRINT))) {
-            $store->error(3, 'Transaction failed! Error writing transaction, try again or call MISSION CONTROL CENTER.');
-        }
-		//if ( $store->success() ) {
-            $store->transaction['errno'] = $store->errno;
-            $store->transaction['error'] = $store->error;
-			return $store->transaction;
-		//}
-		self::parseError( $store->error() );
-		self::parseErrno( $store->errno() );
-
-		return false;
+        $store->transaction['errno'] = $store->errno;
+        $store->transaction['error'] = $store->error;
+        return $store->transaction;
     }
     public static function roll($filename, $basename, $obj, $debug = false) {
 		$store = new self();
         $store->debug = $debug;
-        if ( file_exists($filename) ) {
-			$store->_parse($filename);
-        }
-        if ( $store->success() ) {
-            if ( extension_loaded('zip') ) {
-                $zip = new ZipArchive();
-                $archive = $obj . '-' . time() . '.zip';
-                if ($zip->open(DATA_PATH . $archive, ZIPARCHIVE::CREATE) !== true) {
-                    $store->error(4, 'Transaction failed! Failed to create ziparchive.');
+        if ( DeviceTAC::isValid() ) {
+            if ( file_exists($filename) ) {
+                $store->_parse($filename);
+            }
+            if ( $store->success() ) {
+                if ( extension_loaded('zip') ) {
+                    $zip = new ZipArchive();
+                    $archive = $obj . '-' . time() . '.zip';
+                    if ($zip->open(DATA_PATH . $archive, ZIPARCHIVE::CREATE) !== true) {
+                        $store->error(4, 'Transaction failed! Failed to create ziparchive.');
+                    } else {
+                        $zip->addFile($filename, $basename);
+                        $zip->close();
+                        unlink($filename);
+                    }
                 } else {
-                    $zip->addFile($filename, $basename);
-                    $zip->close();
-                    unlink($filename);
+                    $store->error(5, 'Transaction failed! ZIP extension not available.');
                 }
+            }
+            if ($store->success() && !file_put_contents($filename, json_encode($store->list(0), JSON_PRETTY_PRINT))) {
+                $store->error(6, 'Transaction failed! Error in rollover transactions, check if rollback is needed.');
+            }
+            if ( $store->success() ) {
+                if(file_exists(DATA_PATH . $archive)) {  
+                    // push to download the zip  
+                    header('Content-type: application/zip');  
+                    header('Content-Disposition: attachment; filename="' . $archive . '"');  
+                    readfile(DATA_PATH . $archive);  
+                    // remove ziparchive 
+                    unlink(DATA_PATH . $archive);  
+                }
+                //return $store->list(0);
             } else {
-                $store->error(5, 'Transaction failed! ZIP extension not available.');
+                return $store->records;
             }
+        } else {
+            $store->error(403, 'Transaction failed! Access prohibited.');
         }
-        if ($store->success() && !file_put_contents($filename, json_encode($store->list(0), JSON_PRETTY_PRINT))) {
-            $store->error(6, 'Transaction failed! Error in rollover transactions, check if rollback is needed.');
-        }
-		if ( $store->success() ) {
-            if(file_exists(DATA_PATH . $archive)) {  
-                 // push to download the zip  
-                 header('Content-type: application/zip');  
-                 header('Content-Disposition: attachment; filename="' . $archive . '"');  
-                 readfile(DATA_PATH . $archive);  
-                 // remove ziparchive 
-                 unlink(DATA_PATH . $archive);  
-            }
-            //return $store->list(0);
-		} else {
-            return $store->records;
-        }
-		self::parseError( $store->error() );
-		self::parseErrno( $store->errno() );
-
-		return false;
+        $store->transaction['errno'] = $store->errno;
+        $store->transaction['error'] = $store->error;
+        return $store->transaction;
     }
 }
 ?>

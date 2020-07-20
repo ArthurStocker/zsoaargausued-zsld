@@ -14,21 +14,24 @@ require_once 'config/settings.php';
  */
 $url = $_SERVER['SCRIPT_NAME'];
 
-$debug ='';
-$failed = '';
-$success ='';
-$benutzer = '';
+$debug = '';
+$message = '';
 
-$form = '';
-$form .= '<div class="form-group">';
-$form .= '    <label for="user">User ID</label>';
-$form .= '    <input id="user" name="user" type="text" class="form-control" aria-describedby="userHelp" autocomplete="name" placeholder="Vorname Nachname">';
-$form .= '    <small id="userHelp" class="form-text text-muted">Bitte gebe deinen Vornamen und Nachnamen ein.</small>';
-$form .= '</div>';
-$form .= '<div class="form-group">';
-$form .= '    <label for="password">Password</label>';
-$form .= '    <input id="password" name="password" type="password" class="form-control" autocomplete="current-password" placeholder="Passwort">';
-$form .= '</div>';
+$loginForm = '';
+$loginForm .= '<div class="form-group">';
+$loginForm .= '    <label for="username">User ID</label>';
+$loginForm .= '    <input id="username" name="username" type="text" class="form-control" aria-describedby="userHelp" autocomplete="name" placeholder="Benutzername">';
+$loginForm .= '    <small id="userHelp" class="form-text text-muted">Bitte gebe deine Benutzername ein.</small>';
+$loginForm .= '</div>';
+$loginForm .= '<div class="form-group">';
+$loginForm .= '    <label for="password">Password</label>';
+$loginForm .= '    <input id="password" name="password" type="password" class="form-control" autocomplete="current-password" placeholder="Passwort">';
+$loginForm .= '</div>';
+
+$logoutForm = '';
+$logoutForm .= '<div class="form-group">';
+$logoutForm .= '    <input id="logout" name="logout" type="checkbox" class="form-control" checked style="visibility: hidden;">';
+$logoutForm .= '</div>';
 
 $formAction = '';
 $formAction .= '<script>';
@@ -45,122 +48,179 @@ $closeButton = '';
 $closeButton .= '<script>';
 $closeButton .= '    $("#zsld-login-button-cancel").hide();';
 $closeButton .= '    if ($("#zsld-login-button-ok").attr("type") == "submit")';
-$closeButton .= '        $("#zsld-login-button-ok").text("Schliessen").removeAttr("type").attr("data-dismiss", "modal").data("dismiss", "modal").toggleClass("btn-success").toggleClass("btn-defaullt");';
+$closeButton .= '        $("#zsld-login-button-ok").text("Schliessen").removeAttr("type").attr("data-dismiss", "modal").data("dismiss", "modal").toggleClass("btn-success", false).toggleClass("btn-default", true);';
 $closeButton .= '</script>';
 
-$actionButton = '';
-$actionButton .= '<script>';
-$actionButton .= '    $("#modal-login").on("hide.bs.modal", function (e) {';
-$actionButton .= '        $("#zsld-login-form").trigger("reset");';
-$actionButton .= '    });';
-$actionButton .= '    if ($("#zsld-login-button-ok").attr("data-dismiss") == "modal")';
-$actionButton .= '        $("#zsld-login-button-ok").text("Einloggen").attr("type", "submit").removeData("dismiss").removeAttr("data-dismiss");';
-$actionButton .= '</script>';
+$loginButton = '';
+$loginButton .= '<script>';
+$loginButton .= '    $("#modal-login").on("hide.bs.modal", function (e) {';
+$loginButton .= '        $("#zsld-login-form").trigger("reset");';
+$loginButton .= '    });';
+$loginButton .= '    $("#zsld-login-button-cancel").show();';
+$loginButton .= '    if ($("#zsld-login-button-ok").attr("data-dismiss") == "modal" || $("#zsld-login-button-ok").text() == "Ausloggen")';
+$loginButton .= '        $("#zsld-login-button-ok").text("Einloggen").attr("type", "submit").removeAttr("data-dismiss").removeData("dismiss").toggleClass("btn-success", true).toggleClass("btn-default", false);';
+$loginButton .= '</script>';
 
-/**
- * Die Angaben über Benutzer und Passwörter einlesen.
- */
-if ( file_exists(DATA_PATH  . 'registration-users-db.txt') ) {
-    /**
-     * Die Benutzer und Passwürter werden i.d.R. aus einer Datenbank ausgelesen.
-     */
-    if ( !( $benutzer = json_decode( file_get_contents(DATA_PATH  . 'registration-users-db.txt'), TRUE ) ) ) {
+$logoutButton = '';
+$logoutButton .= '<script>';
+$logoutButton .= '    $("#modal-login").on("hide.bs.modal", function (e) {';
+$logoutButton .= '        $("#zsld-login-form").trigger("reset");';
+$logoutButton .= '    });';
+$logoutButton .= '    $("#zsld-login-button-cancel").show();';
+$logoutButton .= '    if ($("#zsld-login-button-ok").attr("data-dismiss") == "modal" || $("#zsld-login-button-ok").text() == "Einloggen")';
+$logoutButton .= '        $("#zsld-login-button-ok").text("Ausloggen").attr("type", "submit").removeAttr("data-dismiss").removeData("dismiss").toggleClass("btn-success", true).toggleClass("btn-defaull", false);';
+$logoutButton .= '</script>';
 
-        $failed .= '<b>Login failed. Die Datenbank kann nicht gelesen werden.</b>';
-        $failed .= $closeButton;
+DeviceTAC::restore(  DeviceTAC::read( 'expiration' ) );
 
-        die($failed);
-    }
-} else {
-    /**
-     * Die Datenbank existiert nicht oder enthält keine der benötigten Angaben.
-     * Daher soll sie mit den standart Werten befüllt werden.
-     */
-    $benutzer = array(
-        'root' => '$2y$10$wjCBR6aj4lbDB2wpmrQLKeJEmkJtI6Hs5JMzpDtJdNnD1uD2rmEaC', 
-        'admin' => '$2y$10$l0skWinDdGlZBF9/tp7HrOXgFqizNKwXd.jItVQ5AcLBSkLaYOzIe'
-    );
-    if ( !file_put_contents( DATA_PATH  . 'registration-users-db.txt', json_encode( $benutzer, JSON_PRETTY_PRINT ) ) ) {
+if ( !DeviceTAC::read( 'auth' ) ) {
+    $userForm = $loginForm . $formAction . $loginButton;
 
-        $failed .= '<b>Login fehlgeschlagen. Die Datenbank existiert nicht und wurde zurückgesetzt.</b>';
-        $failed .= $closeButton;
-
-        die($failed);
-    }
-}
- 
-if ( isset($_POST['user']) && $_POST['user'] != "" && isset($_POST['password']) && $_POST['password'] != "" ) {
-    /**
-     * Kontrolle, ob User und Password korrekt sind.
-     */
-
-    $debug .= '<script>';
-    $debug .= '    console.debug("Device, user and password: ", "' . DEVICE_TAC . '", "' . $_POST['user'] . '", "' . password_hash($_POST['password'],  PASSWORD_DEFAULT) . '");';
-    $debug .= '</script>';
-
-    if ( !isset( $benutzer[$_POST['user']] ) ) {
-
-        $failed .= '<b>Login fehlgeschlagen.</b>';
-        $failed .= $closeButton;
-
-        $failed .= $debug;
-
-        die($failed);
-    }
-
-    if ( password_verify( $_POST['password'], $benutzer[$_POST['user']] ) ) {
+    if ( isset($_POST['username']) && $_POST['username'] != "" && isset($_POST['password']) && $_POST['password'] != "" ) {
         /**
-         * Die Anmaeldung war erfolgreich.
+         * Kontrolle, ob der Benutzername und das Passwort korrekt sind.
          */
 
-        DeviceTAC::restore(60 * 60 * 24);
+        //$debug .= '<script>';
+        //$debug .= '    console.debug("Device, username and password: ", "' . DEVICE_TAC . '", "' . $_POST['username'] . '", "' . password_hash($_POST['password'],  PASSWORD_DEFAULT) . '");';
+        //$debug .= '</script>';
 
-        if( password_needs_rehash( $benutzer[$_POST['user']], PASSWORD_DEFAULT ) ) {
-           /**
-            *  Der Hashalgorithmus des gespeicherten Passworts genügt nicht mehr den aktuellen Anforderungen,
-            *  daher sollte es mittels password_hash() neu gehast und anstelle des alten Hashes in
-            *  der Datenbank gespeichert werden, hier wird es nur in der entsprechenden Variable geändert:
-            */
-            $benutzer[$_POST['user']] = password_hash($_POST['password'],  PASSWORD_DEFAULT);
+        if ( DeviceTAC::read( 'user' )['data'] === $_POST['username'] ) {
+            /**
+             * Der Benutzername ist korrekt.
+             */
 
-            $debug .= '<script>';
-            $debug .= '    console.debug("Rehashed password: ", "' . $benutzer[$_POST['user']] . '");';
-            $debug .= '</script>';
+            if ( password_verify( $_POST['password'], DeviceTAC::read( 'user' )['properties']['Passwort'] ) ) {
+                /**
+                 * Das Passwort ist korrekt.
+                 */
 
-            if (!file_put_contents( DATA_PATH  . 'registration-users-db.txt', json_encode( $benutzer, JSON_PRETTY_PRINT ) ) ) {
+                if( password_needs_rehash( DeviceTAC::read( 'user' )['properties']['Passwort'], PASSWORD_DEFAULT ) ) {
+                    /**
+                     * Der Hashalgorithmus des gespeicherten Passworts genügt nicht mehr den aktuellen Anforderungen,
+                     * daher sollte es mittels password_hash() neu gehast und anstelle des alten Hashes in
+                     * der Datenbank gespeichert werden:
+                     */
+                    $data = DeviceTAC::read( 'user' );
+                    $data['properties']['Passwort'] = password_hash($_POST['password'],  PASSWORD_DEFAULT);
 
-                $failed .= '<b>Login fehlgeschlagen. Die Datenbank konnte nicht aktualisiert werden.</b>';
-                $failed .= $closeButton;
+                    //$debug .= '<script>';
+                    //$debug .= '    console.debug("Rehashed password: ", "' . DeviceTAC::read( 'user' )['properties']['Passwort'] . '");';
+                    //$debug .= '</script>';
 
-                $failed .= $debug;
+                    $response = ObjectStore::save($data, 'access', $data->id, $data->concurrentobjectsallowed, DATA_PATH . (string)constant( "DATASTORE_" . strtoupper( 'access' ) ) . '.json');
 
-                die($failed);
+                    if ( $response->error ) {
+                        /**
+                         * Die Datenbank konnte nicht aktualisiert werden.
+                         */
+                        $message .= '<b>Login fehlgeschlagen. Die Datenbank konnte nicht aktualisiert werden.</b>';
+                        $message .= $closeButton;
+
+                        $message .= $debug;
+
+                        die($message);
+                    }
+                }
+
+                /**
+                 * Die Anmeldung war erfolgreich.
+                 */
+                $message .= '<b>Login erfolgreich</b>';
+                $userForm = $closeButton;
+
+                DeviceTAC::write( 'auth', true );
+
+                $message .= '<script>';
+                $message .= '    AUTH = ' . ( ( is_bool( DeviceTAC::read( 'auth' ) ) && DeviceTAC::read( 'auth' ) ) ? 'true' : 'false' ) . ';';
+                $message .= '    Plugins.login.toggle("Logout");';
+                $message .= '</script>';
+
+            } else {
+                /**
+                 * Die Anmeldung ist fehlgeschlagen.
+                 */
+                $message .= '<b>Login fehlgeschlagen. Bitte prüfe die Angaben.</b>';
+                
+                DeviceTAC::write( 'auth', false );
+
+                $message .= '<script>';
+                $message .= '    AUTH = ' . ( ( is_bool( DeviceTAC::read( 'auth' ) ) && DeviceTAC::read( 'auth' ) ) ? 'true' : 'false' ) . ';';
+                $message .= '    Plugins.login.toggle("Login");';
+                $message .= '</script>';
+
             }
-        }
-
-        $success .= '<b>Login erfolgreich</b>';
-
-        DeviceTAC::write( 'user', $_POST['user'] );
-        if ( DeviceTAC::read( 'user' ) === 'root' ) {
-            DeviceTAC::write( 'adm', 1);
-        } elseif ( DeviceTAC::read( 'user' ) === 'admin' ) {
-            DeviceTAC::write( 'adm', 2);
         } else {
-            DeviceTAC::write( 'adm', 4);
+            /**
+             * Der Benutzername ist nicht korrekt.
+             * Ev. prüfen ob als System-Benutzer (root, admin) eingelogged wird.
+             */
+
+            $message .= '<b>Login fehlgeschlagen.</b>';
+            $message .= $closeButton;
+
+            $message .= $debug;
+
+            die($message);
         }
+
+    }
+
+    $message .= $userForm;
+
+    $message .= $debug;
+
+} else {
+    $userForm = $logoutForm . $formAction . $logoutButton;
+
+    if ( isset($_POST['logout']) && $_POST['logout'] ) {
+        /**
+         * Die Abmeldung war erfolgreich.
+         */
+        $message .= '<b>Logout erfolgreich</b>';
+        $userForm = $closeButton;
+
+        DeviceTAC::write( 'auth', false );
+        DeviceTAC::commit();
+
+        $message .= '<script>';
+        $message .= '    AUTH = ' . ( ( is_bool( DeviceTAC::read( 'auth' ) ) && DeviceTAC::read( 'auth' ) ) ? 'true' : 'false' ) . ';';
+        $message .= '    Plugins.login.toggle("Login");';
+        $message .= '</script>';
 
     } else {
         /**
-         * Die Anmeldung ist fehlgeschlagen.
+         * Die Abmeldung ist fehlgeschlagen.
          */
-
-        $failed .= '<b>Login fehlgeschlagen. Bitte prüfe die Angaben.</b>';
+        $message .= '<b>Du bist Eingeloggt</b>';
         
-        DeviceTAC::write( 'adm', 0);
+        DeviceTAC::write( 'auth', true );
+
+        $message .= '<script>';
+        $message .= '    AUTH = ' . ( ( is_bool( DeviceTAC::read( 'auth' ) ) && DeviceTAC::read( 'auth' ) ) ? 'true' : 'false' ) . ';';
+        $message .= '    Plugins.login.toggle("Logout");';
+        $message .= '</script>';
+
     }
+
+    $message .= $userForm;
+    $message .= $debug;
 }
  
-if ( DeviceTAC::read( 'adm' ) > 0 ) {
+if ( !DeviceTAC::read( 'auth' ) ) {
+    /**
+     * Setze den Status zurück auf ausgeloggt.
+     */
+    DeviceTAC::abort();
+
+    /**
+     * Zeige das Anmeldeformular.
+     */
+    echo $message;
+
+    // Programm wird hier beendet, denn der Benutzer ist noch nicht eingeloggt.
+    exit;
+} else {
     /**
      * Setze den Status auf eingeloggt.
      */
@@ -169,36 +229,9 @@ if ( DeviceTAC::read( 'adm' ) > 0 ) {
     /**
      * Zeige Erfolgsmeldung.
      */
-    $login = '';
-    $login .= $success;
-    $login .= $closeButton;
-    
-    $login .= $debug;
-
-    echo $login;
+    echo $message;
 
     // Programm wird hier weitergeführt, denn der Benutzer ist eingeloggt.
-} else {
-    /**
-     * Setze den Status zurück auf eingeloggt.
-     */
-    DeviceTAC::abort();
-
-    /**
-     * Zeige das Anmeldeformular.
-     */
-    $login = '';
-    $login .= $failed;
-    $login .= $form;
-    $login .= $formAction;
-    $login .= $actionButton;
-
-    $login .= $debug;
-
-    echo $login;
-
-    // Programm wird hier beendet, denn der Benutzer ist noch nicht eingeloggt.
-    exit;
 }
 
 // hier kommt Programmteil/Datenausgabe für berechtige Benutzer ...

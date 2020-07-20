@@ -1,23 +1,5 @@
 {
-  "done": [],
-  "in-progress": [
-    {
-      "assignedTo": {
-        "name": "arthur"
-      },
-      "category": "usability",
-      "creation_time": "2020-04-30T18:39:25.420Z",
-      "description": {
-        "content": "requests to the data and login api shoud be secured.\n1. not registered devices are permited to read/write data for 180 sec (configurable), register as unknow after timeout\n2. only registered devices are permited to read/write data for a individual period\n3. grants to users are configurable and get disabled after individual timeout",
-        "mime": "text/markdown"
-      },
-      "id": "3",
-      "prio": 1,
-      "references": [],
-      "title": "secure read/write requests"
-    }
-  ],
-  "testing": [
+  "done": [
     {
       "assignedTo": {
         "name": "arthur"
@@ -51,6 +33,41 @@
       "type": "bug"
     }
   ],
+  "in-progress": [
+    {
+      "assignedTo": {
+        "name": "arthur"
+      },
+      "category": "usability",
+      "creation_time": "2020-04-30T18:39:25.420Z",
+      "description": {
+        "content": "requests to the data and login api shoud be secured.\n1. not registered devices are permited to read/write data for 180 sec (configurable), register as unknow after timeout\n2. only registered devices are permited to read/write data for a individual period\n3. grants to users are configurable and get disabled after individual timeout",
+        "mime": "text/markdown"
+      },
+      "id": "3",
+      "prio": 1,
+      "references": [],
+      "title": "secure read/write requests"
+    }
+  ],
+  "testing": [
+    {
+      "assignedTo": {
+        "name": "arthur"
+      },
+      "category": "ui",
+      "creation_time": "2020-05-01T12:52:24.836Z",
+      "description": {
+        "content": "The menu item transactions is not allways visible \n-> ex. in the desktop browser {gmü}, in the mobile browser (Android) {tke}",
+        "mime": "text/markdown"
+      },
+      "id": "5",
+      "prio": 2,
+      "references": [],
+      "title": "service \"transactions\" not allways visible in the ui",
+      "type": "bug"
+    }
+  ],
   "todo": [
     {
       "assignedTo": {
@@ -62,26 +79,14 @@
         "content": "1. link car transaction with driver (transaction->device->user)\n2. report car transaction history\n3. report by car and driver",
         "mime": "text/markdown"
       },
+      "details": {
+        "content": "Report History: by Driver and Device, by Car\nReport KM used: prerequisit is to ask for the odometer count on check-in and check-out ",
+        "mime": "text/markdown"
+      },
       "id": "4",
       "prio": 2,
       "references": [],
       "title": "reports on different transactions"
-    },
-    {
-      "assignedTo": {
-        "name": "arthur"
-      },
-      "category": "ui",
-      "creation_time": "2020-05-01T12:52:24.836Z",
-      "description": {
-        "content": "The menu item transactions is not allways visible \n-> ex. in the desktop browser {gmü}, int the mobile browser (Android) {tke}",
-        "mime": "text/markdown"
-      },
-      "id": "5",
-      "prio": 2,
-      "references": [],
-      "title": "service \"transactions\" not allways visible in the ui",
-      "type": "bug"
     }
   ]
 }
