@@ -99,8 +99,9 @@ class Rest {
                 $response = "Error: 'Missing object!'";
             }
         }
-		header('Content-Type: application/json');
-		echo json_encode($response, JSON_PRETTY_PRINT);	
+        if ( $response ) {
+            return $response;
+        }
     }
     public function update($data, $type, $obj, $id) {
         if ($type === 'access' || $type === 'device' || $type === 'iam') {

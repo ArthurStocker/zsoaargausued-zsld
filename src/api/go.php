@@ -47,6 +47,7 @@ switch($requestMethod) {
 				header("HTTP/1.0 422 Unprocessable Entity");
 			} else {
 				header("HTTP/1.0 201 Created");
+				header('Content-Type: application/json');
 			}
 		} else {
 			header("HTTP/1.0 404 Not Found");

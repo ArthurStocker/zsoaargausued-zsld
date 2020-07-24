@@ -16,11 +16,15 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 switch($requestMethod) {
 	case 'GET':
 		if (isset($_GET['type']) && isset($_GET['object'])) {
-			$api->update($_GET, (string)$_GET['type'], (string)$_GET['object'], 'NULL');
+			$transaction = $api->update($_GET, (string)$_GET['type'], (string)$_GET['object'], 'NULL');
 		} elseif (array_key_exists('here', $_GET) && isset($_GET['id'])) {
-			$api->update('{ "display": "check-out" }', (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), (int)$_GET['id']);
+			$transaction = $api->update('{ "display": "check-out" }', (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), (int)$_GET['id']);
 		} else {
 			header("HTTP/1.0 404 Not Found");
+		}
+		if (isset($transaction)) {
+			header('Content-Type: application/json');
+			echo json_encode($transaction, JSON_PRETTY_PRINT);
 		}
 		break;
 	case 'POST':
@@ -40,12 +44,13 @@ switch($requestMethod) {
 					header("HTTP/1.0 422 Unprocessable Entity");
 				} else {
 					header("HTTP/1.0 201 Created");
+					header('Content-Type: application/json');
 				}
 			} else {
 				header("HTTP/1.0 404 Not Found");
 			}
 		} else {
-			header("HTTP/1.0 405 Method Not Allowed");
+			header("HTTP/1.1 403 Forbidden");
 		}
 		break;
 	default:

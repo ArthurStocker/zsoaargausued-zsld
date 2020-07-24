@@ -3,7 +3,7 @@ chdir("..");
 
 require_once 'class/DeviceTAC.php';
 
-DeviceTAC::build(TRUE, "GET, PUT, POST, DELETE, OPTIONS");
+DeviceTAC::build(TRUE, "PUT, POST, OPTIONS");
 
 
 require_once 'class/Rest.php';
@@ -31,12 +31,13 @@ switch($requestMethod) {
 					header("HTTP/1.0 422 Unprocessable Entity");
 				} else {
 					header("HTTP/1.0 201 Created");
+					header('Content-Type: application/json');
 				}
 			} else {
 				header("HTTP/1.0 404 Not Found");
 			}
 		} else {
-			header("HTTP/1.0 405 Method Not Allowed");
+			header("HTTP/1.1 403 Forbidden");
 		}
 		break;
 	default:
