@@ -16,36 +16,43 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 switch($requestMethod) {
 	case 'GET':
 		if ( DeviceTAC::read( 'auth' ) ) {
-			if ( isset($_GET['transaction']) && isset($_GET['objectstore']) ) {
-				$transactionstore = $api->read($_GET, 'transaction', (string)$_GET['transaction'], -1);
-				foreach ($transactionstore->transactions as $transaction) {
-					$ids = Array();
-					$ids['oid'] = $transaction['uniquedevice'];
-					$properties = $api->read($ids, 'objectstore', (string)$_GET['objectstore'], 0)->objects[0]['properties'];
-					foreach (array_keys($properties) as $key) {
-						$transaction[$key] = $properties[$key];
-					}
-					$transactions[] = $transaction;
-				}
+			require_once 'class/Reports.php';
+			if ( isset($_GET['definition']) ) {
+				/**
+				 * call build method of ReportingClass 
+				 * 
+				 * shomething like:
+				 */
+				$transactions = Reports::build( $_GET['definition'] );
+			} else {
+				/**
+				 * but for now just deliver this report
+				 * 
+				 * begin_default_report
+				 */
+				$transactions = Reports::build( "" );
+				/**
+				 * end_default_report
+				 * 
+				 */
 			}
 			if ( isset($transactions) ) {
 				if ( isset($_GET['format']) ) {
+					$rows[] = array_keys($transactions[0]);
+					foreach ($transactions as $row) {
+						$rows[] = $row;
+					}
 					switch( (string)$_GET['format'] ) {
 						case 'xlsx':
 							require_once 'class/SimpleXLSXGen.php';
-							$rows[] = array_keys($transactions[0]);
-							foreach ($transactions as $row) {
-								$rows[] = $row;
-							}
 							$xlsx = SimpleXLSXGen::fromArray( $rows );
 							$xlsx->downloadAs('report.xlsx');
 							break;
 						case 'csv':
 						default:
-							header('Content-Type: application/csv');
-							header('Content-Disposition: attachment; filename=report.csv');
-							header('Pragma: no-cache');
-							echo getcsv($transactions);
+							require_once 'class/SimpleCSVGen.php';
+							$csv = SimpleCSVGen::fromArray( $rows );
+							$csv->downloadAs('report.csv');
 							break;
 					}
 				} else {
@@ -65,29 +72,5 @@ switch($requestMethod) {
 	default:
 		header("HTTP/1.0 405 Method Not Allowed");
 		break;
-}
-
-/**
- * Convert a multi-dimensional, associative array to CSV data
- * @param  array $data the array of data
- * @return string       CSV text
- */
-function getcsv($data) {
-	# Generate CSV data from array
-	$fh = fopen('php://temp', 'rw'); # don't create a file, attempt
-									 # to use memory instead
-
-	# write out the headers
-	fputcsv($fh, array_keys(current($data)));
-
-	# write out the data
-	foreach ( $data as $row ) {
-			fputcsv($fh, $row);
-	}
-	rewind($fh);
-	$csv = stream_get_contents($fh);
-	fclose($fh);
-
-	return $csv;
 }
 ?>
