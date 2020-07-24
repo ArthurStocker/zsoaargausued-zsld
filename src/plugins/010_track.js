@@ -37,11 +37,11 @@ if (new Plugins('track')) {
           var registration = '';
           registration += '    <div class="row">';
           registration += '        <div class="col-xs-4 col-md-4">Geräte Registration</div>';
-          registration += '        <div id="zsld-tracking-registration" class="col-xs-8 col-md-8">' + device.data + '</div>';
+          registration += '        <div id="zsld-tracking-registration" class="col-xs-8 col-md-8">' + (device && device.data ? device.data : "") + '</div>';
           registration += '    </div>';
           $('#zsld-tracking-success').html(registration);
 
-          if (device.oid) {
+          if (device && device.oid) {
             $('#zsld-tracking-device').text(device.oid.substring(0, 39) + '…');
           }
 
@@ -127,7 +127,7 @@ if (new Plugins('track')) {
       if (REGISTERED_DEVICE == 1) {
         var url = URL_TRANSACTIONS.replace(/(type=)[^&]*/, '$1objectstore');
         url = url.replace(/(object=)[^&]*/, '$1devices');
-        url += '&id=0';
+        //url += '&id=0';
         $http_tracking.get(url);
       }
     } else {

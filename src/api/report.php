@@ -31,6 +31,15 @@ switch($requestMethod) {
 			if ( isset($transactions) ) {
 				if ( isset($_GET['format']) ) {
 					switch( (string)$_GET['format'] ) {
+						case 'xlsx':
+							require_once 'class/SimpleXLSXGen.php';
+							$rows[] = array_keys($transactions[0]);
+							foreach ($transactions as $row) {
+								$rows[] = $row;
+							}
+							$xlsx = SimpleXLSXGen::fromArray( $rows );
+							$xlsx->downloadAs('report.xlsx');
+							break;
 						case 'csv':
 						default:
 							header('Content-Type: application/csv');
