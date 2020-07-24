@@ -39,15 +39,19 @@
         "name": "arthur"
       },
       "category": "usability",
-      "creation_time": "2020-04-30T18:39:25.420Z",
+      "creation_time": "2020-04-30T18:41:56.509Z",
       "description": {
-        "content": "requests to the data and login api shoud be secured.\n1. not registered devices are permited to read/write data for 180 sec (configurable), register as unknow after timeout\n2. only registered devices are permited to read/write data for a individual period\n3. grants to users are configurable and get disabled after individual timeout",
+        "content": "1. link car transaction with driver (transaction->device->user)\n2. report car transaction history\n3. report by car and driver\n\nopen: odometer data need to be implemented",
         "mime": "text/markdown"
       },
-      "id": "3",
-      "prio": 1,
+      "details": {
+        "content": "Report History: by Driver and Device, by Car\nReport KM used: prerequisit is to ask for the odometer count on check-in and check-out ",
+        "mime": "text/markdown"
+      },
+      "id": "4",
+      "prio": 2,
       "references": [],
-      "title": "secure read/write requests"
+      "title": "reports on different transactions"
     }
   ],
   "testing": [
@@ -66,27 +70,22 @@
       "references": [],
       "title": "service \"transactions\" not allways visible in the ui",
       "type": "bug"
-    }
-  ],
-  "todo": [
+    },
     {
       "assignedTo": {
         "name": "arthur"
       },
       "category": "usability",
-      "creation_time": "2020-04-30T18:41:56.509Z",
+      "creation_time": "2020-04-30T18:39:25.420Z",
       "description": {
-        "content": "1. link car transaction with driver (transaction->device->user)\n2. report car transaction history\n3. report by car and driver",
+        "content": "requests to the data and login api shoud be secured.\n1. not registered devices are permited to read/write data for 180 sec (configurable), register as unknow after timeout\n2. only registered devices are permited to read/write data for a individual period\n3. grants to users are configurable and get disabled after individual timeout",
         "mime": "text/markdown"
       },
-      "details": {
-        "content": "Report History: by Driver and Device, by Car\nReport KM used: prerequisit is to ask for the odometer count on check-in and check-out ",
-        "mime": "text/markdown"
-      },
-      "id": "4",
-      "prio": 2,
+      "id": "3",
+      "prio": 1,
       "references": [],
-      "title": "reports on different transactions"
+      "title": "secure read/write requests"
     }
-  ]
+  ],
+  "todo": []
 }
