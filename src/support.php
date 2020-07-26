@@ -50,12 +50,12 @@ $setup = new Setup();
                     <h3 class="panel-title">Support: Geräteangaben</h3>
                 </div>
                 <div class="panel-body">
-
+                
                     <?php 
 //echo $_SERVER["REQUEST_METHOD"] . "<br />\n";
 if (defined("DEVICE_TAC")) {
     echo "<pre>Dein DEVICE_TAC ist: " . constant("DEVICE_TAC") . "</pre><br />\n";
-    echo "<pre>" . json_encode($GLOBALS["SUPPORT"] , JSON_PRETTY_PRINT). "</pre><br />\n"; 
+    echo "<pre>" . str_replace(array("<", ">"), array("\<", "\>"), json_encode($GLOBALS["SUPPORT"] , JSON_PRETTY_PRINT)). "</pre><br />\n"; 
     $keys = '';
     if ( $keys = json_decode( file_get_contents( DATA_PATH  . 'registration-popup-key.txt' ) ) ) {
         if ( $_SERVER["REQUEST_METHOD"] === "POST" ) {
@@ -75,25 +75,144 @@ if (defined("DEVICE_TAC")) {
                 $keys = '';
             }
         } else {
-            if ( in_array( DEVICE_TAC, $keys ) ) {
-                echo "<b>Das Gerät ist zur Anzeige des Registrationsdialoges vorgemerkt.</b><br />\n";
-                $register = TRUE;
-            } else {
-                echo "<b>Das Gerät ist nicht zur Anzeige des Registrationsdialoges vorgemerkt.</b><br />\n";
-                $register = FALSE;
-            }
-            echo '    <form id="zsld-support-form" action="' .  $_SERVER['SCRIPT_NAME'] . '" method="POST"' . ">\n";
-            echo '        <label for="zsld-support-checkbox-enabledialog">Registrationsdialog immer anzeigen</label>' . "\n";
-            echo '        <input id="zsld-support-checkbox-enabledialog" name="enabledialog" type="checkbox" class=""' . ( $register ?  " checked" : "" ) . ">\n";
-            echo '        <button id="zsld-support-button-submit" class="" type="submit">Speichern</button>' . "\n";
-            echo '    </form>' . "\n";
+            ?>
+            <form id="zsld-support-form" action="<?php echo $_SERVER['SCRIPT_NAME'] ?>" method="POST">
+                <style>
+                /* The switch - the box around the slider */
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 60px;
+                    height: 34px;
+                    left: 10px;
+                    bottom: 7px;
+                    float: right;
+                }
+
+                /* The confirm buton - the button to submit */
+                .confirm {
+                    position: relative;
+                    display: inline-block;
+                    bottom: 7px;
+                    float: right;
+                }
+        
+                /* Hide default HTML checkbox */
+                .switch input {
+                    display:none;
+                }
+        
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+        
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 26px;
+                    width: 26px;
+                    left: 4px;
+                    bottom: 4px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+        
+                input.default:checked + .slider {
+                    background-color: #444;
+                }
+                input.primary:checked + .slider {
+                    background-color: #2196F3;
+                }
+                input.success:checked + .slider {
+                    background-color: #8bc34a;
+                }
+                input.info:checked + .slider {
+                    background-color: #3de0f5;
+                }
+                input.warning:checked + .slider {
+                    background-color: #FFC107;
+                }
+                input.danger:checked + .slider {
+                    background-color: #f44336;
+                }
+        
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+        
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(26px);
+                    -ms-transform: translateX(26px);
+                    transform: translateX(26px);
+                }
+        
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 34px;
+                }
+        
+                .slider.round:before {
+                    border-radius: 50%;
+                }
+                </style>
+
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading">
+                    <?php
+                        if ( in_array( DEVICE_TAC, $keys ) ) {
+                            echo "<b>Das Gerät ist zur Anzeige des Registrationsdialoges vorgemerkt.</b><br />\n";
+                            $register = FALSE;
+                        } else {
+                            echo "<b>Das Gerät ist nicht zur Anzeige des Registrationsdialoges vorgemerkt.</b><br />\n";
+                            $register = TRUE;
+                        }
+                        
+                        // //echo '        <label for="zsld-support-checkbox-enabledialog">Registrationsdialog immer anzeigen</label>' . "\n";
+                        // //echo '        <input id="zsld-support-checkbox-enabledialog" name="enabledialog" type="checkbox" class=""' . ( $register ?  " checked" : "" ) . "></input>\n";
+                        // echo '        <div class="input-group">' . "\n";
+                        // echo '            <label for="zsld-support-checkbox-enabledialog">Registrationsdialog immer anzeigen</label>' . "\n";
+                        // echo '            <div class="input-group-prepend">' . "\n";
+                        // echo '                  <div class="input-group-text">' . "\n";
+                        // echo '                      <input id="zsld-support-checkbox-enabledialog" name="enabledialog" type="checkbox" aria-label="Checkbox enabledialog"></input>' . "\n";
+                        // echo '                  </div>' . "\n";
+                        // echo '            </div>' . "\n";
+                        // echo '            <button id="zsld-support-button-submit" class="btn btn-success" type="submit">Speichern</button>' . "\n";
+                        // echo '        </div>' . "\n";
+                    ?>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                Registrationsdialog immer anzeigen
+                                <label for="zsld-support-checkbox-enabledialog" class="switch ">
+                                    <input id="zsld-support-checkbox-enabledialog" name="enabledialog" aria-label="Checkbox enabledialog" type="checkbox" class="primary" <?php echo ( $register ?  " checked" : "" ) ?>>
+                                    <span class="slider round"></span>
+                                </label>
+                            </li>
+                        </ul>
+                        <button id="zsld-support-button-submit" class="btn btn-success confirm" type="submit">Speichern</button>
+                    </div>
+                </div> 
+
+            </form>
+            <?php
         }
     }
 } else {
     echo "<pre>Fehler: kein DEVICE_TAC definiert.</pre><br />\n";
 }
                     ?>
-
                 </div>
             </div>
         </div>

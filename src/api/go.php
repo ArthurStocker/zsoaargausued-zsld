@@ -28,7 +28,8 @@ switch($requestMethod) {
 			exit;
 		}
 		if (isset($transaction)) {
-			header("Location: https://" . $_SERVER['HTTP_HOST'] . "/map/?tic=" . $transaction['tic'] . "&data=" . $transaction['data'] . "&type=" . $transaction['type'] . "&id=" . $transaction['id'] . "&valid=" . $transaction['valid'] . "&errno=" . $transaction['errno'] . "&error=" . $transaction['error'], true, 303);
+			//header("Location: https://" . $_SERVER['HTTP_HOST'] . "/map/?tic=" . $transaction['tic'] . "&data=" . $transaction['data'] . "&type=" . $transaction['type'] . "&id=" . $transaction['id'] . "&valid=" . $transaction['valid'] . "&errno=" . $transaction['errno'] . "&error=" . $transaction['error'], true, 303);
+			header("Location: https://" . $_SERVER['HTTP_HOST'] . "/map/odometer?tic=" . $transaction['tic'] . "&data=" . $transaction['data'] . "&type=" . $transaction['type'] . "&id=" . $transaction['id'] . "&valid=" . $transaction['valid'] . "&errno=" . $transaction['errno'] . "&error=" . $transaction['error'], true, 303);
 		}
 		break;
 	case 'POST':
