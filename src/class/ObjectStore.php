@@ -71,30 +71,31 @@ class ObjectStore {
         foreach ($this->records as $id => $row) {
             //TODO: compare against TIC 
             if ( /* $row['tic'] === $data->tic && */ $row['oid'] === $oid && $row['type'] === $type ) {
-                $state = true; 
+                $state = true;
+                $rid = $id;
              }
         }
         
         if ( $state ) {
 
-            $this->records[$id]['id'] = $data->id;
+            $this->records[$rid]['id'] = $data->id;
             //$this->records[$id]['tic'] = $this->_createTIC();
             //$this->records[$id]['oid'] = $oid;
             //$this->records[$id]['type'] = $type;
-            $this->records[$id]['data'] = $data->display;
-            $this->records[$id]['properties'] = $data->properties;
-            $this->records[$id]['concurrentobjectsallowed'] = $data->concurrentobjectsallowed;
+            $this->records[$rid]['data'] = $data->display;
+            $this->records[$rid]['properties'] = $data->properties;
+            $this->records[$rid]['concurrentobjectsallowed'] = $data->concurrentobjectsallowed;
             //$this->records[$id]['valid'] = date(DATE_ATOM);
-            $this->records[$id]['decision'] = date(DATE_ATOM);
-            $this->records[$id]['transaction'] = date(DATE_ATOM);
+            $this->records[$rid]['decision'] = date(DATE_ATOM);
+            $this->records[$rid]['transaction'] = date(DATE_ATOM);
 
             if (defined("DEVICE_TAC")) {
-                $this->records[$id]['executingdevice'] = constant("DEVICE_TAC");
+                $this->records[$rid]['executingdevice'] = constant("DEVICE_TAC");
             } else {
-                $this->records[$id]['executingdevice'] = '';
+                $this->records[$rid]['executingdevice'] = '';
             }
 
-            $this->transaction = (array)$this->records[$id];
+            $this->transaction = (array)$this->records[$rid];
             
         } else {
             $this->error(409, 'Transaction failed, object not found!');

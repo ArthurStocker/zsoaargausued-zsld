@@ -38,7 +38,7 @@ switch($requestMethod) {
 			$transaction = $api->create($data , (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), constant("DEVICE_TAC"), true);
 		} elseif (array_key_exists('register', $_GET) && defined("DEVICE_TAC")) {
 			$data = file_get_contents("php://input");
-			$transaction = $api->create($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), constant("DEVICE_TAC"));
+			$transaction = $api->update($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), constant("DEVICE_TAC"));
 		}
 		if (isset($transaction)) {
 			echo json_encode($transaction, JSON_PRETTY_PRINT);

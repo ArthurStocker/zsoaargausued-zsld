@@ -31,7 +31,6 @@ $setup = new Setup();
     </head>
 
     <body>
-        <script src="https://api3.geo.admin.ch/loader.js?lang=de&version=4.4.2"></script>
         <script src='https://use.fontawesome.com/releases/v5.4.1/js/all.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.2/jquery.xdomainrequest.min.js'></script>

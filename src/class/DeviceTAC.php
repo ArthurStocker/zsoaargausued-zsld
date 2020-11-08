@@ -57,6 +57,30 @@ class DeviceTAC {
 
         return $htac;
     }
+    private function registerDevice() {
+
+        $data = new stdClass();
+        $data->id = "U" . dechex( date_timestamp_get( date_create() ));
+        $data->display = "unbekannt";
+        $data->properties = new stdClass();
+        $data->properties->Name = "unbekannt";
+        $data->properties->Vorname = "unbekannt";
+        $data->properties->IPN = "unbekannt";
+        $data->properties->trackme = false;
+        $data->properties->notifymc = false;
+        $data->forceconcurrentobjects = false;
+        $data->concurrentobjectsallowed = false;
+
+        //New device. Data access granted for 180 sec
+        self::debug("ZSLDDEBUG_DEVICETAC_BUILD_1", json_decode( '{ "error": "Das Gerät wurde in der Geräte-Datenbank nicht gefunden. Neues Gerät, der Zugriff wird für 180 Sekunden gewährt damit eine Registrierung stattfinden kann." }' ) );
+        self::session();
+        self::write( 'auth', false );
+        self::commit();
+
+        $response = ObjectStore::save( json_encode( $data, JSON_PRETTY_PRINT ), "device", DEVICE_TAC, false, DATA_PATH . DATASTORE_DEVICE . '.json' );
+
+        return $response;
+    }
     public function headers($methods) {
         
         if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] != '') {
@@ -192,25 +216,7 @@ class DeviceTAC {
             setcookie( "deviceTAC", $htac, time()+60*60*24*365*100, "/", "zso-aargausued.ch", true, true);
             define( "DEVICE_TAC", $htac );
 
-            $data = new stdClass();
-            $data->id = "U" . dechex( date_timestamp_get( date_create() ));
-            $data->display = "unbekannt";
-            $data->properties = new stdClass();
-            $data->properties->Name = "unbekannt";
-            $data->properties->Vorname = "unbekannt";
-            $data->properties->IPN = "unbekannt";
-            $data->properties->trackme = false;
-            $data->properties->notifymc = false;
-            $data->forceconcurrentobjects = false;
-            $data->concurrentobjectsallowed = false;
-
-            //New device. Data access granted for 180 sec
-            self::debug("ZSLDDEBUG_DEVICETAC_BUILD_1", json_decode( '{ "error": "Das Gerät wurde in der Geräte-Datenbank nicht gefunden. Neues Gerät, der Zugriff wird für 180 Sekunden gewährt damit eine Registrierung stattfinden kann." }' ) );
-            self::session();
-            self::write( 'auth', false );
-            self::commit();
-
-            $response = ObjectStore::save( json_encode( $data, JSON_PRETTY_PRINT ), "device", DEVICE_TAC, false, DATA_PATH . DATASTORE_DEVICE . '.json' );
+            $result = $self->registerDevice();
         } else {
             define( "DEVICE_TAC", $_COOKIE["deviceTAC"] );
             $user = null;
@@ -247,18 +253,27 @@ class DeviceTAC {
 
                             $expiration = $duration . " seconds";
 
-                            self::debug("ZSLDDEBUG_DEVICETAC_BUILD_6", json_decode( '{ "decision": "' . $user['decision'] . '", "periode": "' . $user['properties']['Periode'] . '", "expiration": "' . $expiration . '", "user":' . json_encode( $user ) ) );
+                            self::debug("ZSLDDEBUG_DEVICETAC_BUILD_7", json_decode( '{ "decision": "' . $user['decision'] . '", "periode": "' . $user['properties']['Periode'] . '", "expiration": "' . $expiration . '", "user": ' . json_encode( $user ) . ' }') );
                         } else {
                             //Can't find user in UserDB. Data access prohibited
-                            self::debug("ZSLDDEBUG_DEVICETAC_BUILD_5",  json_decode( '{ "error": "Der Benutzer konnte in der Benutzer-Datenbank nicht gefunden werden. Der Zugriff wird verweigert." }' ) );
+                            self::debug("ZSLDDEBUG_DEVICETAC_BUILD_6",  json_decode( '{ "error": "Der Benutzer konnte in der Benutzer-Datenbank nicht gefunden werden. Der Zugriff wird verweigert." }' ) );
                         }
                     } else {
                         //Can't parse UserDB. Data access prohibited
-                        self::debug("ZSLDDEBUG_DEVICETAC_BUILD_4",  json_decode( '{ "error": "Die Benutzer-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert." }' ) );
+                        self::debug("ZSLDDEBUG_DEVICETAC_BUILD_5",  json_decode( '{ "error": "Die Benutzer-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert." }' ) );
                     }
                 } else {
-                    //Device identified but unknown to the backend. Data access prohibited
-                    self::debug("ZSLDDEBUG_DEVICETAC_BUILD_3", json_decode( '{ "error": "Das Gerät wurde identifiziert aber nicht in der Geräte-Datenbank registriert. Der Zugriff wird verweigert." }' ) );
+                    if ( empty( $response ) ) {
+                        //Device identified but unknown to the backend. Data access prohibited
+                        self::debug("ZSLDDEBUG_DEVICETAC_BUILD_4", json_decode( '{ "error": "Das Gerät wurde identifiziert aber nicht in der Geräte-Datenbank gefunden. Das Gerät wurde hinzugefügt. Bitte um erneute Registierung des Gerätes in den nächsten 3 Minuten durch neuladen der Hauptseite." }' ) );
+                        
+                        $result = $self->registerDevice();
+
+                        $expiration = "+180 seconds";
+                    } else {
+                        //Device identified but not registered. Data access prohibited
+                        self::debug("ZSLDDEBUG_DEVICETAC_BUILD_3", json_decode( '{ "error": "Das Gerät wurde identifiziert aber nicht in der Geräte-Datenbank registriert. Der Zugriff wird verweigert." }' ) );
+                    }
                 }
             } else {
                 //Can't parse ObjectStore. Data access prohibited

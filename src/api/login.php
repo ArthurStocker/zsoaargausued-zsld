@@ -1,10 +1,10 @@
 <?php
+chdir("..");
+
 require_once 'class/DeviceTAC.php';
 
 DeviceTAC::build(TRUE, "GET, POST");
 
-
-require_once 'config/settings.php';
 
 
 /**

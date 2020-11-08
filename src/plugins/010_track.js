@@ -86,6 +86,11 @@ if (new Plugins('track')) {
                         url: URL_ZSLD_PERSON,
                         filter: function(persons) {
                             return persons.results;
+                        },
+                        ajax: {
+                            xhrFields: {
+                                withCredentials: true
+                            }
                         }
                     }
                 });
