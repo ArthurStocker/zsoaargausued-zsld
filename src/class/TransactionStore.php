@@ -44,6 +44,7 @@ class TransactionStore {
         $object->tic = $this->_createTIC();
         $object->type = $type;
         $object->data = $data;
+// save person from session
         $object->valid = date(DATE_ATOM);
         $object->decision = date(DATE_ATOM);
         $object->transaction = date(DATE_ATOM);

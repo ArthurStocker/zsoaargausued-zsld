@@ -1,4 +1,6 @@
 <?php
+$GLOBALS["SUPPORT"] = [];
+
 require_once 'class/DeviceTAC.php';
 
 DeviceTAC::build(TRUE, "GET");
@@ -10,6 +12,14 @@ require_once 'config/ui.php';
 $setup = new Setup();
 $ui = new UI();
 
+
+if ( DeviceTAC::read( 'person' ) && json_decode( DeviceTAC::read( 'person' ) )->display === "unbekannt" ) {
+    $expiration = "-10 seconds";
+    DeviceTAC::abort();
+    DeviceTAC::restore( $expiration );
+    DeviceTAC::write( 'expiration', $expiration );
+    DeviceTAC::commit();
+}
 
 if (defined("ERROR")) {
 
@@ -69,7 +79,6 @@ if (defined("ERROR")) {
     </head>
 
     <body>
-
         <script src="https://api3.geo.admin.ch/loader.js?lang=de&version=4.4.2"></script>
         <script src='https://use.fontawesome.com/releases/v5.4.1/js/all.js'></script>
         <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>

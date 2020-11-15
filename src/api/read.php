@@ -16,7 +16,7 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 switch($requestMethod) {
 	case 'GET':
 		if ( isset($_GET['type']) ) {
-			if ( isset($_GET['object']) && ( DeviceTAC::read( 'auth' ) || ( (string)$_GET['object'] === 'devices' && !isset($_GET['id']) ) || ( (string)$_GET['object'] !== 'devices'  && (string)$_GET['object'] !== 'users' ) ) ) {
+			if ( isset($_GET['object']) && ( DeviceTAC::read( 'auth' ) || ( (string)$_GET['object'] === 'devices' && !isset($_GET['id']) ) || ( (string)$_GET['object'] !== 'devices' && (string)$_GET['object'] !== 'users' ) ) ) {
 				if ( isset($_GET['id']) ) {
 					$transaction = $api->read($_GET, (string)$_GET['type'], (string)$_GET['object'], (int)$_GET['id']);
 				} else {

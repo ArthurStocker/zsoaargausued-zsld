@@ -45,6 +45,7 @@ class ObjectStore {
         $object->oid = $oid;
         $object->type = $type;
         $object->data = $data->display;
+// save person from session
         $object->properties = $data->properties;
         $object->concurrentobjectsallowed = $data->concurrentobjectsallowed;
         $object->valid = date(DATE_ATOM);
@@ -83,6 +84,7 @@ class ObjectStore {
             //$this->records[$id]['oid'] = $oid;
             //$this->records[$id]['type'] = $type;
             $this->records[$rid]['data'] = $data->display;
+    // save person from session
             $this->records[$rid]['properties'] = $data->properties;
             $this->records[$rid]['concurrentobjectsallowed'] = $data->concurrentobjectsallowed;
             //$this->records[$id]['valid'] = date(DATE_ATOM);

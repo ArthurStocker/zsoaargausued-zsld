@@ -1,12 +1,12 @@
 // general post-loading scripts
 $(document).ready(function() {
+  var isClosed = true;
   var trigger = $('.hamburger');
   var overlay = $('.overlay');
-  var isClosed = false;
 
-  trigger.click(hamburger_cross);
+  trigger.click(sidebar_toggle);
 
-  function hamburger_cross() {
+  function sidebar_toggle() {
 
     if (isClosed == true) {
       overlay.hide();
@@ -14,7 +14,7 @@ $(document).ready(function() {
       trigger.addClass('is-closed');
       isClosed = false;
     } else {
-      //overlay.show();
+      overlay.show();
       trigger.removeClass('is-closed');
       trigger.addClass('is-open');
       isClosed = true;
@@ -25,7 +25,7 @@ $(document).ready(function() {
     $('#wrapper').toggleClass('toggled');
   });
 
-  hamburger_cross();
+  sidebar_toggle();
   $('#wrapper').toggleClass('toggled')
   $('.menu-toggle').hide();
 });

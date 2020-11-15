@@ -17,8 +17,6 @@ switch($requestMethod) {
 	case 'GET':
 		if (isset($_GET['type']) && isset($_GET['object'])) {
 			$transaction = $api->update($_GET, (string)$_GET['type'], (string)$_GET['object'], 'NULL');
-		} elseif (array_key_exists('here', $_GET) && isset($_GET['id'])) {
-			$transaction = $api->update('{ "display": "check-out" }', (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), (int)$_GET['id']);
 		} else {
 			header("HTTP/1.0 404 Not Found");
 		}
@@ -32,7 +30,7 @@ switch($requestMethod) {
 		 * allow only if AUTHenticatied user
 		 */
 		if ( DeviceTAC::read( 'auth' ) ) {
-			if (array_key_exists('permissions', $_GET) && defined("DEVICE_TAC")) {
+			if (array_key_exists('permissions', $_GET)) {
 				$data = file_get_contents("php://input");
 				$transaction = $api->update($data, (string)$_GET['permissions'], (string)constant("DATASTORE_" . strtoupper($_GET['permissions'])), json_decode($data)->id);
 			} 

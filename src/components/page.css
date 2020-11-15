@@ -10,12 +10,13 @@
 
 #wrapper.toggled #page-content-wrapper {
   position: absolute;
-  margin-right: -10em;
+  /*margin-right: -10em;*/
+  padding-right: 10em;
 }
 
 
 /*-------------------------------
- *       Hamburger-Cross
+ *           Menu-Toggle
  *-------------------------------*/
 
 .menu-toggle {

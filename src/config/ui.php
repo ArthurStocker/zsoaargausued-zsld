@@ -10,25 +10,7 @@ class UI {
     public function init() { 
 ?>
 <script>
-<?php 
-    if (DeviceTAC::isValid() && $objects = ObjectStore::parse(DATA_PATH . DATASTORE_DEVICE . '.json')) {
-        $data = ObjectStore::build( $objects->list("0") );
-        $registered = 0;
-        if ( !empty($data->objects) && $data->objects[0]['data'] !== "unbekannt" )  {
-            $registered = 1;
-        }
-        define("REGISTERED_DEVICE", $registered);
-        echo "\nvar REGISTERED_DEVICE = " . $registered . ";\n";
-        //echo "var DEBUG_REGISTERED_DEVICE = " . json_encode($data, JSON_PRETTY_PRINT) . ";\n";
-    } else {
-        define("REGISTERED_DEVICE", -2);
-        define("REGISTRATION_ERROR", ObjectStore::parseError());
-        echo "\nvar REGISTERED_DEVICE = -2;\n";
-        echo "var REGISTRATION_ERROR = '" . ObjectStore::parseError() . "';\n";
-    }
-
-    echo "\nvar QUERY_STRING = " . json_encode($_GET, JSON_PRETTY_PRINT) . ";\n\n";
-
+<?php
     echo "\nvar AUTH = " . ( ( is_bool( DeviceTAC::read( 'auth' ) ) && DeviceTAC::read( 'auth' ) ) ? 'true' : 'false' ) . ";\n\n";
 
     if ($xlsx = SimpleXLSX::parse(SETTINGS)) {
@@ -65,7 +47,7 @@ class UI {
             }
         }
     } else {
-    $data = SimpleXLSX::parseError();
+        $data = SimpleXLSX::parseError();
     }
 ?>
 </script>

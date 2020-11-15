@@ -46,7 +46,12 @@ class Rest {
     public function create($data, $type, $obj, $id, $concurrent = false) {
         $response = null;
 
-        if ($type === 'access' || $type === 'device' || $type === 'iam') {
+        if ($type === 'device') {
+            DeviceTAC::restore();
+            DeviceTAC::write( 'person', $data);
+            DeviceTAC::commit();
+            $response = json_decode( $data );
+        } elseif ($type === 'access' || $type === 'iam') {
             $response = ObjectStore::save($data, $type, $id, $concurrent, DATA_PATH . $obj . '.json');
         } else {
             $response = TransactionStore::save($data, $type, $id, $concurrent, DATA_PATH . $obj . '.json');
@@ -104,7 +109,12 @@ class Rest {
         }
     }
     public function update($data, $type, $obj, $id) {
-        if ($type === 'access' || $type === 'device' || $type === 'iam') {
+        if ($type === 'device') {
+            DeviceTAC::restore();
+            DeviceTAC::write( 'person', $data);
+            DeviceTAC::commit();
+            $response = json_decode( $data );
+        } elseif ($type === 'access' || $type === 'iam') {
             $response = ObjectStore::update($data, $type, $id, DATA_PATH . $obj . '.json');
         } elseif ($type === 'objectstore') {
             $response = ObjectStore::roll(DATA_PATH . $obj . '.json', $obj . '.json', $obj);

@@ -33,7 +33,6 @@ switch($requestMethod) {
 				$transactions = Reports::build( "" );
 				/**
 				 * end_default_report
-				 * 
 				 */
 			}
 			if ( isset($transactions) ) {
