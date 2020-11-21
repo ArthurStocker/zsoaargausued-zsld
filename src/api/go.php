@@ -38,10 +38,13 @@ switch($requestMethod) {
 			$transaction = $api->create($data , (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), $_GET['id'], true);
 		} elseif (array_key_exists('register', $_GET)) {
 			$data = file_get_contents("php://input");
-			$transaction = $api->update($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), json_decode($data)->id);
+			//$transaction = $api->update($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), json_decode($data)->id);
+			DeviceTAC::restore();
+            DeviceTAC::write( 'person', $data );
+            DeviceTAC::commit();
+            $transaction = json_decode( $data );
 		}
 		if (isset($transaction)) {
-			echo json_encode($transaction, JSON_PRETTY_PRINT);
 			if ($transaction['errno'] === 409) { 
 				header("HTTP/1.0 409 Conflict");
 			} elseif ($transaction['errno'] !== 0) { 
@@ -50,6 +53,7 @@ switch($requestMethod) {
 				header("HTTP/1.0 201 Created");
 				header('Content-Type: application/json');
 			}
+			echo json_encode($transaction, JSON_PRETTY_PRINT);
 		} else {
 			header("HTTP/1.0 404 Not Found");
 		}

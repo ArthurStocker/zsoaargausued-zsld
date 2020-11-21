@@ -56,7 +56,7 @@ if (defined("ERROR")) {
                 </div>
                 <div class="panel-body" style="height: calc(100vh - 58px);">
                     <?php
-                    //echo $_SERVER["REQUEST_METHOD"] . "<br />\n";
+                    echo DeviceTAC::redirect()->location . "&nbsp" . DeviceTAC::redirect()->params ;
                     ?>
                     <!-- Tabs Container -->
                     <div id="support-container" lass="form-horizontal collapse in" aria-expanded="true" style="">
@@ -91,7 +91,7 @@ if (defined("ERROR")) {
                             /**
                              * Tabpanes if DEVICE_TAC is set and the user is logged-in
                              */
-                            if ( defined("DEVICE_TAC") && DeviceTAC::read( 'auth' ) ) {
+                            if ( DeviceTAC::isValid() && DeviceTAC::read( 'auth' ) ) {
                             ?>
                                 <!-- Tab pane 'request' -->
                                 <div id="zsld-support-tab-request" role="tabpanel" class="tab-pane active">

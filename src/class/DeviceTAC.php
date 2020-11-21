@@ -51,6 +51,59 @@ class DeviceTAC {
         header("Pragma: no-cache");
 
     }
+    public static function redirect( $path = False, $getRedirectObject = True ) {
+        /*
+        // Request method
+        $link = $_SERVER["REQUEST_METHOD"];
+
+        $link .=  "&nbsp";
+
+        // Protocol 
+        $link .= $_SERVER['SERVER_PROTOCOL'];
+
+        $link .=  "&nbsp";
+
+        // Program to display URL of current page. 
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') 
+            $link .= "https"; 
+        else
+            $link .= "http"; 
+
+        // Here append the common URL characters. 
+        $link .= "://"; 
+
+        // Append the host(domain name, ip) to the URL. 
+        $link .= $_SERVER['HTTP_HOST']; 
+
+        $link .= "&nbsp";
+        
+        // Append the requested resource location to the URL 
+        $link .= $_SERVER['REQUEST_URI']; 
+        
+        // Print the link 
+        echo $link; 
+        */
+
+        $redirectObject = new stdClass();
+        $redirectObject->method = $_SERVER["REQUEST_METHOD"];
+        $redirectObject->protocol = $_SERVER["SERVER_PROTOCOL"];
+        $redirectObject->transport = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
+        $redirectObject->targethost = $_SERVER['HTTP_HOST'];
+        $redirectObject->uri = $_SERVER['REQUEST_URI'];
+        $redirectObject->path = $path ? $path : isset($_GET["redirect"]) ? $_GET["redirect"] : "/map/support";
+        $redirectObject->query = preg_replace("/redirect_param=(.*?)&/", "", preg_replace("/redirect=(.*?)&/", "", $_SERVER['QUERY_STRING']));
+        $redirectObject->params = !strpos($_SERVER['QUERY_STRING'], "redirect_param=") ? "" : str_replace("|", "&", preg_replace("/.*redirect_param=(.*?)&.*/", "?$1", $_SERVER['QUERY_STRING']));
+        $redirectObject->location = $redirectObject->transport  . "://" . $redirectObject->targethost . $redirectObject->path . "?" . $redirectObject->query;
+
+        if ( $getRedirectObject ) {
+            $response = $redirectObject;
+        } else {
+            $response = $getRedirectObject;
+            header("Location: " . $redirectObject->location, true, 303);
+        }
+
+        return $response;
+    }
     public static function debug($key, $message) {
         if (isset($GLOBALS["SUPPORT"])) {
             $GLOBALS["SUPPORT"][$key] = $message;
