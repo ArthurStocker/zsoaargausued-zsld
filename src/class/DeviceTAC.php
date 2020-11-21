@@ -51,7 +51,7 @@ class DeviceTAC {
         header("Pragma: no-cache");
 
     }
-    public static function redirect( $path = False, $getRedirectObject = True ) {
+    public static function redirect( $path = False, $redirect = False ) {
         /*
         // Request method
         $link = $_SERVER["REQUEST_METHOD"];
@@ -90,15 +90,17 @@ class DeviceTAC {
         $redirectObject->transport = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
         $redirectObject->targethost = $_SERVER['HTTP_HOST'];
         $redirectObject->uri = $_SERVER['REQUEST_URI'];
-        $redirectObject->path = $path ? $path : isset($_GET["redirect"]) ? $_GET["redirect"] : "/map/support";
+        $redirectObject->path = ( $path ? $path : ( array_key_exists("redirect", $_GET) ? $_GET["redirect"] : "/map/support" ) );
         $redirectObject->query = preg_replace("/redirect_param=(.*?)&/", "", preg_replace("/redirect=(.*?)&/", "", $_SERVER['QUERY_STRING']));
         $redirectObject->params = !strpos($_SERVER['QUERY_STRING'], "redirect_param=") ? "" : str_replace("|", "&", preg_replace("/.*redirect_param=(.*?)&.*/", "?$1", $_SERVER['QUERY_STRING']));
-        $redirectObject->location = $redirectObject->transport  . "://" . $redirectObject->targethost . $redirectObject->path . "?" . $redirectObject->query;
+        $redirectObject->location = $redirectObject->transport  . "://" . $redirectObject->targethost . $redirectObject->path . ( $redirectObject->query == "" ? "" : "?" . $redirectObject->query );
 
-        if ( $getRedirectObject ) {
+
+
+        if ( !$redirect ) {
             $response = $redirectObject;
         } else {
-            $response = $getRedirectObject;
+            $response = $redirect;
             header("Location: " . $redirectObject->location, true, 303);
         }
 

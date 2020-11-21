@@ -15,6 +15,10 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 switch($requestMethod) {
 	case 'GET':
+		if ( json_decode( DeviceTAC::read( 'person', true ) )->display === "unbekannt" ) {
+			DeviceTAC::redirect("/map/registration", true);
+			exit;
+		}
 		if (array_key_exists('move', $_GET) && isset($_GET['id'])) {
 			$transaction = $api->create('move', (string)$_GET['move'], (string)constant("DATASTORE_" . strtoupper($_GET['move'])), (int)$_GET['id']);
 		} elseif (array_key_exists('park', $_GET) && isset($_GET['id'])) {

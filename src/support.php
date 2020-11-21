@@ -56,7 +56,7 @@ if (defined("ERROR")) {
                 </div>
                 <div class="panel-body" style="height: calc(100vh - 58px);">
                     <?php
-                    echo DeviceTAC::redirect()->location . "&nbsp" . DeviceTAC::redirect()->params ;
+                    echo DeviceTAC::redirect()->location . "&nbsp" . DeviceTAC::redirect()->params . "&nbsp" . DeviceTAC::redirect()->uri;
                     ?>
                     <!-- Tabs Container -->
                     <div id="support-container" lass="form-horizontal collapse in" aria-expanded="true" style="">
