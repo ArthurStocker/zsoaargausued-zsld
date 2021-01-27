@@ -45,6 +45,7 @@ class TransactionStore {
         $object->type = $type;
         $object->data = $data;
 // save person from session
+        $object->person = json_decode( DeviceTAC::read( 'person' ) );
         $object->valid = date(DATE_ATOM);
         $object->decision = date(DATE_ATOM);
         $object->transaction = date(DATE_ATOM);

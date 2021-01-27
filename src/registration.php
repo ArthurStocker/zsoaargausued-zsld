@@ -13,12 +13,6 @@ $setup = new Setup();
 $ui = new UI();
 
 
-/*
-self::write( 'valid', date( DATE_ATOM, strtotime( $lifetime , time() ) ) );
-$valid = ( ( new DateTime( $_SESSION['valid'] ) ) > ( new DateTime() ) );
-( ( $_SESSION['last_access'] ) < ( date( DATE_ATOM, strtotime( "+190 seconds" , time() ) ) ) )
-<?php echo json_encode(DeviceTAC::isValid(), JSON_PRETTY_PRINT) . "\n\n" . json_encode( ( ( $_SESSION['last_access'] ) < ( date( DATE_ATOM, strtotime( "+190 seconds" , time() ) ) ) ), JSON_PRETTY_PRINT) . "\n\n" . json_encode($_SESSION, JSON_PRETTY_PRINT); ?>
-*/
 if ( isset( $_COOKIE["REGISTRATIONDIALOG"] ) || ( !DeviceTAC::isValid() && ( !isset( $_SESSION['last_registration'] ) || ( isset( $_SESSION['last_registration'] ) && ( $_SESSION['last_registration'] <  date( DATE_ATOM, strtotime( "+" . SESSION_MAX_LOCKOUTTIME . " seconds" , time() ) ) ) ) ) ) ) { 
     $expiration = "+180 seconds";
     DeviceTAC::abort();
@@ -27,7 +21,6 @@ if ( isset( $_COOKIE["REGISTRATIONDIALOG"] ) || ( !DeviceTAC::isValid() && ( !is
     DeviceTAC::write( 'expiration', $expiration );
     DeviceTAC::commit();
 }
-
 
 if (defined("ERROR")) {
 
@@ -83,15 +76,18 @@ if (defined("ERROR")) {
             
             echo "\nvar QUERY_STRING = " . json_encode($_GET, JSON_PRETTY_PRINT) . ";\n\n";
 
-            //echo "\nvar SESSION = " . json_encode($_SESSION, JSON_PRETTY_PRINT) . ";\n";
-            //echo "\nvar SUPPORT = " . json_encode($GLOBALS["SUPPORT"], JSON_PRETTY_PRINT) . ";\n\n";
+            if ( array_key_exists("redirect", $_GET) && isset( $_GET["redirect"] ) && $_GET["redirect"] != "" ) {
+                echo "\n" . 'var REDIRECT_TO = "' . DeviceTAC::redirect()->location . '"' . ";\n\n";
+            } else {
+                echo "\n" . 'var REDIRECT_TO = false' . ";\n\n";
+            }
         ?>
         </script>
 
         <?php 
         $ui->init();
         echo '        <script src="' . COMPONENT_PATH . '/' . 'page.js' . '?version=' . time() . '"></script>'; 
-        echo '        <script src="' . PLUGIN_PATH . '/' . '000_app.js' . '?version=' . time() . '"></script>'; 
+        echo '        <script src="' . PLUGIN_PATH . '/' . '000_app.js' . '?version=' . time() . '"></script>';
         ?>
 
         <!-- Warper -->
@@ -173,6 +169,13 @@ if (defined("ERROR")) {
                               //deviceTracking();
 
                               REGISTERED_DEVICE = 2;
+
+                                // if redicrection is set in the request set new location
+                                if (REDIRECT_TO) {
+                                    //document.write("Redirect to: " + REDIRECT_TO);
+                                    location.replace(REDIRECT_TO);
+                                }
+
                             },
                             function(data) {
                               console.error('Error attempting to register your device ', data);

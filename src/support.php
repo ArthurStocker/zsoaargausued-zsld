@@ -53,11 +53,11 @@ if (defined("ERROR")) {
             <div style="margin: 5px;" class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Support und Konfiguration</h3>
+                    <?php
+                    echo "</br>Redirect to:" . DeviceTAC::redirect()->location . "&nbsp*&nbsp" . DeviceTAC::redirect()->path . "&nbsp*&nbsp" . DeviceTAC::redirect()->query . "&nbsp*&nbsp" . DeviceTAC::redirect()->param;
+                    ?>
                 </div>
                 <div class="panel-body" style="height: calc(100vh - 58px);">
-                    <?php
-                    echo DeviceTAC::redirect()->location . "&nbsp" . DeviceTAC::redirect()->params . "&nbsp" . DeviceTAC::redirect()->uri;
-                    ?>
                     <!-- Tabs Container -->
                     <div id="support-container" lass="form-horizontal collapse in" aria-expanded="true" style="">
                         <!-- Nav tabs -->

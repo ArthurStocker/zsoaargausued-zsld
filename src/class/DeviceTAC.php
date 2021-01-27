@@ -51,7 +51,7 @@ class DeviceTAC {
         header("Pragma: no-cache");
 
     }
-    public static function redirect( $path = False, $redirect = False ) {
+    public static function redirect( $path = False, $parameter = "", $redirect = False ) {
         /*
         // Request method
         $link = $_SERVER["REQUEST_METHOD"];
@@ -90,10 +90,10 @@ class DeviceTAC {
         $redirectObject->transport = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http";
         $redirectObject->targethost = $_SERVER['HTTP_HOST'];
         $redirectObject->uri = $_SERVER['REQUEST_URI'];
-        $redirectObject->path = ( $path ? $path : ( array_key_exists("redirect", $_GET) ? $_GET["redirect"] : "/map/support" ) );
+        $redirectObject->path = ( $path ? $path : ( array_key_exists("redirect", $_GET) ? $_GET["redirect"] : str_replace("?" .$_SERVER['QUERY_STRING'], "", $_SERVER['REQUEST_URI']) ) );
         $redirectObject->query = preg_replace("/redirect_param=(.*?)&/", "", preg_replace("/redirect=(.*?)&/", "", $_SERVER['QUERY_STRING']));
-        $redirectObject->params = !strpos($_SERVER['QUERY_STRING'], "redirect_param=") ? "" : str_replace("|", "&", preg_replace("/.*redirect_param=(.*?)&.*/", "?$1", $_SERVER['QUERY_STRING']));
-        $redirectObject->location = $redirectObject->transport  . "://" . $redirectObject->targethost . $redirectObject->path . ( $redirectObject->query == "" ? "" : "?" . $redirectObject->query );
+        $redirectObject->param = !strpos($_SERVER['QUERY_STRING'], "redirect_param=") ? "" : str_replace("|", "&", preg_replace("/.*redirect_param=(.*?)&.*/", "?$1", $_SERVER['QUERY_STRING']));
+        $redirectObject->location = $redirectObject->transport  . "://" . $redirectObject->targethost . $redirectObject->path . ( $parameter == "" && $redirectObject->query == "" ? "" : "?" ) . ( $parameter != "" ? $parameter . "&" : "" ) . ( $redirectObject->query != "" ? $redirectObject->query : "" );
 
 
 
@@ -282,6 +282,13 @@ class DeviceTAC {
         if ( $keys = json_decode( file_get_contents( DATA_PATH  . 'registration.txt' ) ) ) {
             if ( in_array( DEVICE_TAC, $keys ) ) {
                 self::force("1", FALSE, FALSE, TRUE);
+            }
+        }
+
+        $keys = '';
+        if ( $keys = json_decode( file_get_contents( DATA_PATH  . 'tracking.txt' ) ) ) {
+            if ( in_array( DEVICE_TAC, $keys ) ) {
+                self::force("1", TRUE, TRUE, FALSE);
             }
         }
 

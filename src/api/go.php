@@ -16,23 +16,22 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 switch($requestMethod) {
 	case 'GET':
 		if ( json_decode( DeviceTAC::read( 'person', true ) )->display === "unbekannt" ) {
-			DeviceTAC::redirect("/map/registration", true);
+			DeviceTAC::redirect("/map/registration", "redirect=" . DeviceTAC::redirect()->path, true);
+			echo "";
 			exit;
 		}
 		if (array_key_exists('move', $_GET) && isset($_GET['id'])) {
 			$transaction = $api->create('move', (string)$_GET['move'], (string)constant("DATASTORE_" . strtoupper($_GET['move'])), (int)$_GET['id']);
 		} elseif (array_key_exists('park', $_GET) && isset($_GET['id'])) {
 			$transaction = $api->create('park', (string)$_GET['park'], (string)constant("DATASTORE_" . strtoupper($_GET['park'])), (int)$_GET['id']);
-		//} elseif (array_key_exists('here', $_GET) && isset($_GET['id'])) {
-		//	$transaction = $api->create('{ "display": "check-in" }', (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), (int)$_GET['id'], true);
-		//} elseif (array_key_exists('show', $_GET) && isset($_GET['show']) && isset($_GET['id'])) {
-		//	$api->read($_GET, 'transaction', (string)constant("DATASTORE_" . strtoupper($_GET['show'])), (int)$_GET['id']);
+		} elseif (array_key_exists('here', $_GET) && isset($_GET['id'])) {
+			$transaction = $api->create('{ "id":0, "display": "registration", "properties": "non","concurrentobjectsallowed": true }', (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), (int)$_GET['id'], true);
+			exit;
 		} else {
 			header("HTTP/1.0 404 Not Found");
 			exit;
 		}
 		if (isset($transaction)) {
-			//header("Location: https://" . $_SERVER['HTTP_HOST'] . "/map/?tic=" . $transaction['tic'] . "&data=" . $transaction['data'] . "&type=" . $transaction['type'] . "&id=" . $transaction['id'] . "&valid=" . $transaction['valid'] . "&errno=" . $transaction['errno'] . "&error=" . $transaction['error'], true, 303);
 			header("Location: https://" . $_SERVER['HTTP_HOST'] . "/map/odometer?tic=" . $transaction['tic'] . "&data=" . $transaction['data'] . "&type=" . $transaction['type'] . "&id=" . $transaction['id'] . "&valid=" . $transaction['valid'] . "&errno=" . $transaction['errno'] . "&error=" . $transaction['error'], true, 303);
 		}
 		break;
@@ -43,9 +42,21 @@ switch($requestMethod) {
 		} elseif (array_key_exists('register', $_GET)) {
 			$data = file_get_contents("php://input");
 			//$transaction = $api->update($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), json_decode($data)->id);
+			if ( !file_put_contents( DATA_PATH  . 'debug_200.txt', json_encode( $data, JSON_PRETTY_PRINT ) ) ) {
+			}
+			if ( !file_put_contents( DATA_PATH  . 'debug_210.txt', json_encode( session_status(), JSON_PRETTY_PRINT ) ) ) {
+			}
+			if ( !file_put_contents( DATA_PATH  . 'debug_211.txt', json_encode( session_id(), JSON_PRETTY_PRINT ) ) ) {
+			}
 			DeviceTAC::restore();
-            DeviceTAC::write( 'person', $data );
-            DeviceTAC::commit();
+			if ( !file_put_contents( DATA_PATH  . 'debug_220.txt', json_encode( session_status(), JSON_PRETTY_PRINT ) ) ) {
+			}
+			if ( !file_put_contents( DATA_PATH  . 'debug_221.txt', json_encode( session_id(), JSON_PRETTY_PRINT ) ) ) {
+			}
+			DeviceTAC::write( 'person', $data );
+			DeviceTAC::commit();
+			if ( !file_put_contents( DATA_PATH  . 'debug_230.txt', json_encode( $_SESSION, JSON_PRETTY_PRINT ) ) ) {
+			}
             $transaction = json_decode( $data );
 		}
 		if (isset($transaction)) {
