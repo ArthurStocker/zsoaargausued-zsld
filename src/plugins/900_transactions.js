@@ -59,12 +59,14 @@ if (new Plugins('transaction')) {
               },
               columns: [
                 { title: 'ID', data: 'id' },
-                /*{ data: 'type' },*/
-                { title: 'Status', data: 'data' },
-                /*{ data: 'valid' },*/
-                { title: 'Bestätigt', data: 'decision' },
+                /*{ data: 'data' },*/
+                { title: 'Wert', data: 'data' },
+                /*{ data: 'data.description' },*/
+                { title: 'Beschreibung', data: 'properties.description', defaultContent: "" },
                 /*{ data: 'transaction' },*/
-                { title: 'Transaktion', data: 'tic' }
+                { title: 'Benutzer', data: 'person.display', defaultContent: "<i>unbekannt</i>" },
+                /*{ data: 'valid' },*/
+                { title: 'Datum', data: 'decision' }
               ],
               buttons: [
                 'searchPanes'

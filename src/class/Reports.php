@@ -1,4 +1,6 @@
 <?php
+require_once 'class/ObjectStore.php';
+require_once 'class/TransactionStore.php';
 
 class Reports {
     
@@ -7,20 +9,27 @@ class Reports {
     private function fahrer() {
         $api = new Rest();
         
-        if ( isset($_GET['transaction']) && isset($_GET['objectstore']) ) {
-            $transactionstore = $api->read($_GET, 'transaction', (string)$_GET['transaction'], -1);
-            foreach ($transactionstore->transactions as $transaction) {
-                $ids = Array();
-                $ids['oid'] = $transaction['uniquedevice'];
-                $properties = $api->read($ids, 'objectstore', (string)$_GET['objectstore'], 0)->objects[0]['properties'];
-                foreach (array_keys($properties) as $key) {
-                    $transaction[$key] = $properties[$key];
+        if ( isset($_GET['objectstore']) ) {
+            $objectstore = $api->read(array("id" => -1), 'objectstore', (string)$_GET['objectstore'], -1);
+            foreach ($objectstore->objects as $record) {
+                $fahrzeug = $record["id"];
+                $wert = $record["data"];
+                if (array_key_exists("properties", $record) && array_key_exists("description", $record["properties"])) {
+                    $action = $record["properties"]["description"];
+                } else {
+                    $action = "";
                 }
-                $transactions[] = $transaction;
+                if (array_key_exists("person", $record) && array_key_exists("display", $record["person"])) {
+                    $benutzer = $record["person"]["display"];
+                } else {
+                    $benutzer = "";
+                }
+                $datum = $record["valid"];
+                $records[] = array( "Fahrzeug" => $fahrzeug, "Wert" => $wert, "Aktion" => $action, "Benutzer" => $benutzer, "Datum" => $datum );
             }
         }
 
-        return $transactions;
+        return $records;
     }
 
     public static function build($name) {

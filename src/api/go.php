@@ -42,21 +42,9 @@ switch($requestMethod) {
 		} elseif (array_key_exists('register', $_GET)) {
 			$data = file_get_contents("php://input");
 			//$transaction = $api->update($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), json_decode($data)->id);
-			if ( !file_put_contents( DATA_PATH  . 'debug_200.txt', json_encode( $data, JSON_PRETTY_PRINT ) ) ) {
-			}
-			if ( !file_put_contents( DATA_PATH  . 'debug_210.txt', json_encode( session_status(), JSON_PRETTY_PRINT ) ) ) {
-			}
-			if ( !file_put_contents( DATA_PATH  . 'debug_211.txt', json_encode( session_id(), JSON_PRETTY_PRINT ) ) ) {
-			}
 			DeviceTAC::restore();
-			if ( !file_put_contents( DATA_PATH  . 'debug_220.txt', json_encode( session_status(), JSON_PRETTY_PRINT ) ) ) {
-			}
-			if ( !file_put_contents( DATA_PATH  . 'debug_221.txt', json_encode( session_id(), JSON_PRETTY_PRINT ) ) ) {
-			}
 			DeviceTAC::write( 'person', $data );
 			DeviceTAC::commit();
-			if ( !file_put_contents( DATA_PATH  . 'debug_230.txt', json_encode( $_SESSION, JSON_PRETTY_PRINT ) ) ) {
-			}
             $transaction = json_decode( $data );
 		}
 		if (isset($transaction)) {

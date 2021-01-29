@@ -196,7 +196,7 @@ class ObjectStore {
     public static function build($rows) {
         $store = new self();
         $geojson = $store->response();
-        
+
         if (DeviceTAC::isValid() && $rows) {
             $geojson->objects = $rows;
         }
@@ -212,7 +212,7 @@ class ObjectStore {
 		return $set ? $errno = $set : $errno;
 	}
     public static function parse($filename, $debug = false) {
-		$store = new self();
+        $store = new self();
 		$store->debug = $debug;
 		if ( file_exists($filename) ) {
 			$store->_parse($filename);

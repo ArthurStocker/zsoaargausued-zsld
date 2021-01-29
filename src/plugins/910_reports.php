@@ -23,8 +23,8 @@
                     <div class="modal-body">
                         <div id="reports-container" lass="form-horizontal collapse in" aria-expanded="true" style="">
                             <div id="zsld-reports" class="form-group">
-                                <a href="/map/api/report?format=csv&definition=fahrer&transaction=fahrzeuge&objectstore=devices" download="bericht.csv">Den Bericht als CSV Datei herunterladen</a></br>
-                                <a href="/map/api/report?format=xlsx&definition=fahrer&transaction=fahrzeuge&objectstore=devices" download="bericht.xlsx">Den Bericht als Excel Datei herunterladen</a>
+                                <a href="/map/api/report?format=csv&definition=fahrer&objectstore=odometer" download="bericht.csv">Den Bericht als CSV Datei herunterladen</a></br>
+                                <a href="/map/api/report?format=xlsx&definition=fahrer&objectstore=odometer" download="bericht.xlsx">Den Bericht als Excel Datei herunterladen</a>
                             </div>
                         </div>
                     </div>

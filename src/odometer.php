@@ -77,11 +77,12 @@ if (defined("ERROR")) {
                              * Daten speichern und redirect zur MAP
                              * ex: https://www.zso-aargausued.ch/map/odometer?tic=447E317E0E9199AE86061C4EB996C5E2&data=park&type=yourcar&id=11&valid=2020-04-26T12:30:00%2b02:00&errno=&error=
                              */
-                            require_once 'class/TransactionStore.php';
+                            require_once 'class/ObjectStore.php';
                             foreach ( array_keys($_POST) as $key ) {
                                 $data[$key] = $_POST[$key];
                             }
-                            $result = TransactionStore::save($data["odometercount"], "odometer", $data['carnr'], TRUE, DATA_PATH . 'odometer.json');
+                            // json_encode( array( odometercount => $data["odometercount"], action => $data["data"] ), JSON_PRETTY_PRINT) 
+                            $result = ObjectStore::save( json_encode( array( "id" => $data['carnr'], "display" => $data["odometercount"], "properties" => array( "description" => $data["data"] ), "concurrentobjectsallowed" => TRUE ), JSON_PRETTY_PRINT), "odometer", $data['carnr'], TRUE, DATA_PATH . 'odometer.json');
                             $data["errno"] = $result["errno"];
                             $data["error"] = $result["error"];
                             header("refresh:2; url=https://" . $_SERVER['HTTP_HOST'] . "/map/" ); //?tic=" . $data['tic'] . "&data=" . $data['data'] . "&type=" . $data['type'] . "&id=" . $data['carnr'] . "&valid=" . $data['valid'] . "&errno=" . $data['errno'] . "&error=" . $data['error']); 

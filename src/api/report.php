@@ -23,22 +23,22 @@ switch($requestMethod) {
 				 * 
 				 * shomething like:
 				 */
-				$transactions = Reports::build( $_GET['definition'] );
+				$records = Reports::build( $_GET['definition'] );
 			} else {
 				/**
 				 * but for now just deliver this report
 				 * 
 				 * begin_default_report
 				 */
-				$transactions = Reports::build( "" );
+				$records = Reports::build( "" );
 				/**
 				 * end_default_report
 				 */
 			}
-			if ( isset($transactions) ) {
+			if ( isset($records) ) {
 				if ( isset($_GET['format']) ) {
-					$rows[] = array_keys($transactions[0]);
-					foreach ($transactions as $row) {
+					$rows[] = array_keys($records[0]);
+					foreach ($records as $row) {
 						$rows[] = $row;
 					}
 					switch( (string)$_GET['format'] ) {
@@ -57,7 +57,7 @@ switch($requestMethod) {
 				} else {
 					$response = new stdClass();
 					$response->type = "Report";
-					$response->objects = $transactions;
+					$response->objects = $records;
 					header('Content-Type: application/json');
 					echo json_encode($response, JSON_PRETTY_PRINT);
 				}

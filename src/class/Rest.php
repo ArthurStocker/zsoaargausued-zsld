@@ -1,4 +1,6 @@
 <?php
+require_once 'config/settings.php';
+
 require_once 'class/Style.php';
 require_once 'class/Feature.php';
 require_once 'class/TextSearch.php';
