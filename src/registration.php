@@ -60,30 +60,6 @@ if (defined("ERROR")) {
         <script src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
         <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
 
-        <script>
-        <?php
-            if ( DeviceTAC::isValid() ) {
-                $registered = 0;
-                if ( json_decode( DeviceTAC::read( 'person' ) )->display !== "unbekannt" ) {
-                    $registered = 1;
-                }
-                define("REGISTERED_DEVICE", $registered);
-                echo "\nvar REGISTERED_DEVICE = " . $registered . ";\n";
-            } else {
-                define("REGISTERED_DEVICE", -2);
-                echo "\nvar REGISTERED_DEVICE = -2;\n";
-            }
-            
-            echo "\nvar QUERY_STRING = " . json_encode($_GET, JSON_PRETTY_PRINT) . ";\n\n";
-
-            if ( array_key_exists("redirect", $_GET) && isset( $_GET["redirect"] ) && $_GET["redirect"] != "" ) {
-                echo "\n" . 'var REDIRECT_TO = "' . DeviceTAC::redirect()->location . '"' . ";\n\n";
-            } else {
-                echo "\n" . 'var REDIRECT_TO = false' . ";\n\n";
-            }
-        ?>
-        </script>
-
         <?php 
         $ui->init();
         echo '        <script src="' . COMPONENT_PATH . '/' . 'page.js' . '?version=' . time() . '"></script>'; 
@@ -162,7 +138,7 @@ if (defined("ERROR")) {
                               }
 
                               if (REGISTERED_DEVICE < 1) {
-                                $('#person').hide();
+                                $('#zsld-tracking-person').parent( ".twitter-typeahead" ).hide();
                                 $('#REGISTRATION_PROHIBITED_BUTTON').hide();
                               }
 
@@ -170,11 +146,11 @@ if (defined("ERROR")) {
 
                               REGISTERED_DEVICE = 2;
 
-                                // if redicrection is set in the request set new location
-                                if (REDIRECT_TO) {
-                                    //document.write("Redirect to: " + REDIRECT_TO);
-                                    location.replace(REDIRECT_TO);
-                                }
+                              // if redicrection is set in the request set new location
+                              if (REDIRECT_TO) {
+                                  //document.write("Redirect to: " + REDIRECT_TO);
+                                  location.replace(REDIRECT_TO);
+                              }
 
                             },
                             function(data) {
@@ -194,10 +170,16 @@ if (defined("ERROR")) {
                           );
 
                           if (REGISTERED_DEVICE < 1) {
+                            var otpsalt = '';
+                            otpsalt += '    <input id="zsld-tracking-salt" type="password" class="form-control" data-provide="secret" style="margin-bottom: 15px; border-radius: 4px; width: calc(100vw - 42px);"';
+                            otpsalt += '        title="persönlicher Schlüssel  …"';
+                            otpsalt += '        placeholder="persönlicher Schlüssel  …">';
+                            $("#zsld-tracking-settings").append(otpsalt);
+
                             var personal = '';
-                            personal += '    <input id="person" type="text" class="form-control typeahead" data-provide="typeahead" style="border-radius: 4px; width: calc(100vw - 42px);"';
+                            personal += '    <input id="zsld-tracking-person" type="text" class="form-control typeahead" data-provide="typeahead" style="margin-bottom: 15px; border-radius: 4px; width: calc(100vw - 42px);"';
                             personal += '        title="Vorname Name  …"';
-                            personal += '        placeholder="Suche Vorname Name  …">';
+                            personal += '        placeholder="Vorname Name  …">';
                             $("#zsld-tracking-settings").append(personal);
 
                             // Initialize bloodhound
@@ -222,7 +204,7 @@ if (defined("ERROR")) {
                             zsld.ADZS.initialize();
 
                             // Initialize typeahead input
-                            $('#person').typeahead(null, {
+                            $('#zsld-tracking-person').typeahead(null, {
                               name: 'persons',
                               displayKey: function(person) {
                                 return person.name;
@@ -236,19 +218,76 @@ if (defined("ERROR")) {
                             });
 
                             // When a result is selected
-                            $('#person').on('typeahead:selected', function(evt, person, suggName) {
-                              console.debug("[$('#person').on('typeahead:selected'])] result ", person);
+                            $('#zsld-tracking-person').on('typeahead:selected', function(evt, person, suggName) {
+                              console.debug("[$('#zsld-tracking-person').on('typeahead:selected'])] result ", person);
+
+                              var otp = '';
+                              otp += '    <div id="zsld-tracking-otp-group" class="input-group" style="margin-bottom: 15px; border-radius: 4px; width: calc(100vw - 42px);">';
+                              otp += '        <span class="input-group-btn" style="font-size: 14px;">';
+                              otp += '            <button id="zsld-tracking-otp-button" class="btn btn-success" type="button">OK</button>';
+                              otp += '        </span>';
+                              otp += '        <input id="zsld-tracking-otp-input" type="text" class="form-control" placeholder="Code  …">';
+                              otp += '    </div>';
+                              $("#zsld-tracking-settings").append(otp);
 
                               person.properties.trackme = $("#zsld-tracking-check-input").is(':checked');
                               person.properties.notifymc = $("#zsld-tracking-check-kp-input").is(':checked');
 
-                              $http_tracking.post(URL_REGISTRATION, JSON.stringify({
-                                "id": person.properties["IPN"],
-                                "display": "<b>" + person.properties["Vorname"] + " " + person.properties["Name"] + "</b>",
-                                "properties": person.properties,
-                                "forceconcurrentobjects": false,
-                                "concurrentobjectsallowed": false
-                              }));
+                              $http_otpauthqrcode = new Rest(
+                                function(data) {
+                                  console.info('OTPAuth QrCode created ', data);
+                                  passed('OTPAuth QrCode created');
+                                  
+                                  person.properties.salt = data.salt;
+                                  person.properties.secret = data.secret;
+
+                                  var otpqrcode = '';
+                                  otpqrcode += '    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#zsld-tracking-otp-qrcode-modal">Authenticator QR Code</button>';
+                                  otpqrcode += '    <div id="zsld-tracking-otp-qrcode-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">';
+                                  otpqrcode += '        <div class="modal-dialog modal-sm" role="document">';
+                                  otpqrcode += '            <div class="modal-content">';
+                                  otpqrcode += '                <div class="modal-header">';
+                                  otpqrcode += '                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>';
+                                  otpqrcode += '                    <h4 class="modal-title" id="mySmallModalLabel">Small modal</h4>';
+                                  otpqrcode += '                </div>';
+                                  otpqrcode += '                <div class="modal-body">';
+                                  otpqrcode += '                    <img src="data:image/png;base64,' + data.qrcode + '">';
+                                  otpqrcode += '                </div>';
+                                  otpqrcode += '            </div>';
+                                  otpqrcode += '        </div>';
+                                  otpqrcode += '    </div>';
+                                  $("#zsld-tracking-settings").append(otpqrcode);
+                                },
+                                function(data) {
+                                  console.error('Error attempting to create the OTPAuth QrCode ', data);
+                                  failed('Error attempting to create the OTPAuth QrCode');
+                                }
+                              );
+
+                              var salt = $("#zsld-tracking-salt").val();
+                              console.debug('OTPAuth Salt ', salt);
+
+                              if (_salt) {
+                                $http_otpauthqrcode.post(URL_OTPAUTHQRCODE, JSON.stringify({
+                                  "salt": salt,
+                                  "username": person.properties["Name"] + person.properties["Vorname"]
+                                }));
+                              }
+
+                              $("#zsld-tracking-otp-button").on( "click", {person: person}, function(evt) {
+                                // TODO: add GoogleAuthenticator
+
+                                console.debug('Person Salt ', evt.data.person.properties.salt);
+                                console.debug('Person Secret ', evt.data.person.properties.secret);
+                                
+                                $http_tracking.post(URL_REGISTRATION, JSON.stringify({
+                                  "id": evt.data.person.properties["IPN"],
+                                  "display": "<b>" + evt.data.person.properties["Vorname"] + " " + evt.data.person.properties["Name"] + "</b>",
+                                  "properties": evt.data.person.properties,
+                                  "forceconcurrentobjects": false,
+                                  "concurrentobjectsallowed": false
+                                }));
+                              });
                             });
                           }
 

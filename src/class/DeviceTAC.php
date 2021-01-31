@@ -238,7 +238,7 @@ class DeviceTAC {
              * Die Angaben über den Benutzer einlesen.
              */
             if ( $userdb = ObjectStore::parse( DATA_PATH . DATASTORE_GRANTACCESS . '.json' ) ) {
-                $users = $userdb->list( 0, array( 'rid' => json_decode( $person )->id /* $response[0]['properties']['IPN'] */ ) );
+                $users = $userdb->list( 0, array( 'rid' => (string)json_decode( $person )->id /* $response[0]['properties']['IPN'] */ ) );
                 if ( !empty( $users ) ) {
                     //User found in UserDB, session valid. Data access granted
                     $user = $users[0];

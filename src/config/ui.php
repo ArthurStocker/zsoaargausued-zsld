@@ -11,6 +11,28 @@ class UI {
 ?>
 <script>
 <?php
+    if ( DeviceTAC::isValid() ) {
+        $registered = 0;
+        if ( json_decode( DeviceTAC::read( 'person' ) )->display !== "unbekannt" ) {
+            $registered = 1;
+        }
+        define("REGISTERED_DEVICE", $registered);
+        echo "\nvar REGISTERED_DEVICE = " . $registered . ";\n";
+    } else {
+        define("REGISTERED_DEVICE", -2);
+        echo "\nvar REGISTERED_DEVICE = -2;\n";
+        echo "\nvar REGISTRATION_ERROR = 'SESSION TIMED OUT!';\n";
+    }
+    
+    echo "\nvar QUERY_STRING = " . json_encode($_GET, JSON_PRETTY_PRINT) . ";\n\n";
+
+    if ( array_key_exists("redirect", $_GET) && isset( $_GET["redirect"] ) && $_GET["redirect"] != "" ) {
+        echo "\n" . 'var REDIRECT_TO = "' . DeviceTAC::redirect()->location . '"' . ";\n\n";
+    } else {
+        echo "\n" . 'var REDIRECT_TO = false' . ";\n\n";
+    }
+
+
     echo "\nvar AUTH = " . ( ( is_bool( DeviceTAC::read( 'auth' ) ) && DeviceTAC::read( 'auth' ) ) ? 'true' : 'false' ) . ";\n\n";
 
     if ($xlsx = SimpleXLSX::parse(SETTINGS)) {

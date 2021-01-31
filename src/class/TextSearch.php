@@ -46,7 +46,7 @@ class TextSearch {
                     $selected[] = $string;
                 }
                 $string = join( $geojson->options['delimiter'], $selected );
-                if ( strpos( $string , $geojson->options['value'] ) ) {
+                if ( strpos( $string , $geojson->options['value'] ) !== false ) {
                     $object = new stdClass();
                     $object->name = join( $geojson->options['delimiter'], $selected );
                     $object->properties = $record;

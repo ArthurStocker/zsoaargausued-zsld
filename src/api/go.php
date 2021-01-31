@@ -42,10 +42,12 @@ switch($requestMethod) {
 		} elseif (array_key_exists('register', $_GET)) {
 			$data = file_get_contents("php://input");
 			//$transaction = $api->update($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), json_decode($data)->id);
+			//$error = $transaction['errno'];
 			DeviceTAC::restore();
 			DeviceTAC::write( 'person', $data );
 			DeviceTAC::commit();
-            $transaction = json_decode( $data );
+			$transaction = json_decode( $data, true);
+			$transaction['errno'] = 0; //$error
 		}
 		if (isset($transaction)) {
 			if ($transaction['errno'] === 409) { 

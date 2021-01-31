@@ -7,6 +7,8 @@ DeviceTAC::build(TRUE, "PUT, POST, OPTIONS");
 
 
 require_once 'class/Rest.php';
+require_once 'lib/phpqrcode/qrlib.php';
+require_once 'lib/googleauthenticator/GoogleAuthenticator.php';
 
 $api = new Rest();
 
@@ -37,7 +39,38 @@ switch($requestMethod) {
 				header("HTTP/1.0 404 Not Found");
 			}
 		} else {
-			header("HTTP/1.1 403 Forbidden");
+			if (array_key_exists('otpauth', $_GET)) {
+				$data = json_decode(file_get_contents("php://input"), true);
+
+				$object = new stdClass();
+				$object->type = "otpauthqrcode";
+
+				if (array_key_exists('salt', $data) && array_key_exists('username', $data) ) {	
+					$GA = new GoogleAuthenticator();
+
+					$salt = password_hash($data['salt'],  PASSWORD_DEFAULT);
+					$secret = $GA->generateSecret();
+					$issuer = "zso-aargausued.ch";
+					$username = $data['username'];
+					$otpauthurl = 'otpauth://totp/'.$issuer.':'.$username.$salt.'?secret='.$secret.'&issuer='.$issuer;
+					
+					ob_start();
+					QRCode::png($otpauthurl, null, QR_ECLEVEL_M, 5, 0, false);
+					$otpauthqrcode = base64_encode(ob_get_contents());
+					ob_end_clean();
+
+					$object->salt = $salt;
+					$object->secret = $secret;
+                    $object->qrcode = $otpauthqrcode;
+				}
+
+				header("HTTP/1.0 201 Created");
+				header('Content-Type: application/json');
+				//echo '<img src="data:image/png;base64,'.$otpauthqrcode.'">';
+				echo json_encode($object, JSON_PRETTY_PRINT);
+			} else {
+				header("HTTP/1.1 403 Forbidden");
+			}
 		}
 		break;
 	default:
