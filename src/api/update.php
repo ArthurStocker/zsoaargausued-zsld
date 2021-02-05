@@ -56,14 +56,14 @@ switch($requestMethod) {
 					header("HTTP/1.0 422 Unprocessable Entity");
 				} else {
 					header("HTTP/1.0 201 Created");
-					header('Content-Type: application/json');
 				}
+				header('Content-Type: application/json');
 				echo json_encode($transaction, JSON_PRETTY_PRINT);
 			} else {
 				header("HTTP/1.0 404 Not Found");
 			}
 		} else {
-			header("HTTP/1.1 403 Forbidden");
+			header("HTTP/1.0 403 Forbidden");
 		}
 		break;
 	default:

@@ -90,7 +90,7 @@ if ( !DeviceTAC::read( 'auth' ) ) {
              * Der Benutzername ist korrekt.
              */
 
-            if ( password_verify( $_POST['password'], DeviceTAC::read( 'user' )['properties']['Passwort'] ) ) {
+            if ( (int)DeviceTAC::read( 'user' )['properties']['Rechte']['Optionen'] == 255 && password_verify( $_POST['password'], DeviceTAC::read( 'user' )['properties']['Passwort'] ) ) {
                 /**
                  * Das Passwort ist korrekt.
                  */

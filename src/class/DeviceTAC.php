@@ -1,4 +1,7 @@
 <?php
+ 
+ 
+ 
 require_once 'config/settings.php';
 
 
@@ -111,7 +114,7 @@ class DeviceTAC {
             $GLOBALS["SUPPORT"][$key] = $message;
         }
     }
-    public static function session( $lifetime = "+180 seconds" ) {
+    public static function session( $lifetime = "+" . SESSION_MIN_DELAYLOCKOUT . " seconds" ) {
         if ( $lifetime !== "" ) { 
             session_set_cookie_params ( "+" . SESSION_GC_MAXLIFETIME . " seconds" /* $lifetime */, "/map/", ".zso-aargausued.ch", TRUE, FALSE );
         }
@@ -123,7 +126,7 @@ class DeviceTAC {
             self::write( 'valid', date(DATE_ATOM, strtotime( $lifetime , time() ) ) );
         }
     }
-    public static function restore( $lifetime = "+3600 seconds" ) { 
+    public static function restore( $lifetime = "+" . SESSION_GC_MAXLIFETIME . " seconds" ) { 
         if ( session_status() === 1 ) {
             self::debug("ZSLDDEBUG_ZSLDSESSION_RESTORE_start", json_decode( '{"STATUS": "1"}') );
             self::session();
@@ -211,6 +214,44 @@ class DeviceTAC {
             setcookie( "REGISTRATIONDIALOG", $flag, time()+30, "/", "zso-aargausued.ch", true, false);
         }
     }
+    public static function getuser($person) {
+        $user = null;
+        $duration = 0;
+        $expiration = "";
+
+        /**
+         * Die Angaben über den Benutzer einlesen.
+         */
+        if ( $userdb = ObjectStore::parse( DATA_PATH . DATASTORE_ACCESS . '.json' ) ) {
+            $users = $userdb->list( 0, array( 'rid' => json_decode( $person, false )->id /* $response[0]['properties']['IPN'] */ ) );
+            if ( !empty( $users ) ) {
+                //User found in UserDB, session valid. Data access granted
+                $user = $users[0];
+
+                $today = new DateTime('now');
+                $decision = new DateTime($user['decision']);
+                $decision->add(DateInterval::createFromDateString($user['properties']['Periode']));
+
+                $duration = ($decision->getTimestamp() - $today->getTimestamp());
+                
+                if ( $duration > 0 ) {
+                    $expiration = "+" . $duration . " seconds";
+                } else {
+                    $expiration = $duration . " seconds";
+                }
+
+                self::debug("ZSLDDEBUG_DEVICETAC_BUILD_4", json_decode( '{ "decision": "' . $user['decision'] . '", "periode": "' . $user['properties']['Periode'] . '", "expiration": "' . $expiration . '", "user": ' . json_encode( $user ) . ' }') );
+            } else {
+                //Can't find user in UserDB. Data access prohibited
+                self::debug("ZSLDDEBUG_DEVICETAC_BUILD_3",  json_decode( '{ "error": "Der Benutzer konnte in der Benutzer-Datenbank nicht gefunden werden. Der Zugriff wird verweigert." }' ) );
+            }
+        } else {
+            //Can't parse UserDB. Data access prohibited
+            self::debug("ZSLDDEBUG_DEVICETAC_BUILD_2",  json_decode( '{ "error": "Die Benutzer-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert." }' ) );
+        }
+
+        return array( "user" => $user, "duration" => $duration, "expiration" => $expiration );
+    }
     public static function build($delete, $methods) { 
         $self = new self();
 
@@ -226,7 +267,7 @@ class DeviceTAC {
         self::session("");
         define( "DEVICE_TAC", session_id());
         if ( self::isValid() ) {
-            $expiration = "+180 seconds";
+            $expiration = "+" . SESSION_MIN_DELAYLOCKOUT . " seconds";
         } else {
             $expiration = "-10 seconds";
         }
@@ -234,39 +275,12 @@ class DeviceTAC {
         self::abort();
 
         if ( $person ) {
-            /**
-             * Die Angaben über den Benutzer einlesen.
-             */
-            if ( $userdb = ObjectStore::parse( DATA_PATH . DATASTORE_GRANTACCESS . '.json' ) ) {
-                $users = $userdb->list( 0, array( 'rid' => (string)json_decode( $person )->id /* $response[0]['properties']['IPN'] */ ) );
-                if ( !empty( $users ) ) {
-                    //User found in UserDB, session valid. Data access granted
-                    $user = $users[0];
-
-                    $today = new DateTime('now');
-                    $decision = new DateTime($user['decision']);
-                    $decision->add(DateInterval::createFromDateString($user['properties']['Periode']));
-
-                    $duration = ($decision->getTimestamp() - $today->getTimestamp());
-                    
-                    if ( $duration > 0 ) {
-                        $duration = "+" . $duration;
-                    }
-
-                    $expiration = $duration . " seconds";
-
-                    self::debug("ZSLDDEBUG_DEVICETAC_BUILD_4", json_decode( '{ "decision": "' . $user['decision'] . '", "periode": "' . $user['properties']['Periode'] . '", "expiration": "' . $expiration . '", "user": ' . json_encode( $user ) . ' }') );
-                } else {
-                    //Can't find user in UserDB. Data access prohibited
-                    self::debug("ZSLDDEBUG_DEVICETAC_BUILD_3",  json_decode( '{ "error": "Der Benutzer konnte in der Benutzer-Datenbank nicht gefunden werden. Der Zugriff wird verweigert." }' ) );
-                }
-            } else {
-                //Can't parse UserDB. Data access prohibited
-                self::debug("ZSLDDEBUG_DEVICETAC_BUILD_2",  json_decode( '{ "error": "Die Benutzer-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert." }' ) );
-            }
+            $entry = self::getuser( $person );
+            $user = $entry['user'];
+            $expiration = $entry['expiration'];
         } else {
             $person = $self->registerDevice();
-            // $expiration = "+180 seconds";
+            // $expiration = "+" . SESSION_MIN_DELAYLOCKOUT . " seconds";
         }
 
 

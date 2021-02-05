@@ -15,7 +15,7 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 switch($requestMethod) {
 	case 'GET':
-		if ( json_decode( DeviceTAC::read( 'person', true ) )->display === "unbekannt" ) {
+		if ( json_decode( DeviceTAC::read( 'person', true ), false )->display === "unbekannt" ) {
 			DeviceTAC::redirect("/map/registration", "redirect=" . DeviceTAC::redirect()->path, true);
 			echo "";
 			exit;
@@ -39,15 +39,6 @@ switch($requestMethod) {
 		if (array_key_exists('here', $_GET) && isset($_GET['id'])) {
 			$data = file_get_contents("php://input");
 			$transaction = $api->create($data , (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), $_GET['id'], true);
-		} elseif (array_key_exists('register', $_GET)) {
-			$data = file_get_contents("php://input");
-			//$transaction = $api->update($data , (string)$_GET['register'], (string)constant("DATASTORE_" . strtoupper($_GET['register'])), json_decode($data)->id);
-			//$error = $transaction['errno'];
-			DeviceTAC::restore();
-			DeviceTAC::write( 'person', $data );
-			DeviceTAC::commit();
-			$transaction = json_decode( $data, true);
-			$transaction['errno'] = 0; //$error
 		}
 		if (isset($transaction)) {
 			if ($transaction['errno'] === 409) { 
@@ -56,8 +47,8 @@ switch($requestMethod) {
 				header("HTTP/1.0 422 Unprocessable Entity");
 			} else {
 				header("HTTP/1.0 201 Created");
-				header('Content-Type: application/json');
 			}
+			header('Content-Type: application/json');
 			echo json_encode($transaction, JSON_PRETTY_PRINT);
 		} else {
 			header("HTTP/1.0 404 Not Found");
