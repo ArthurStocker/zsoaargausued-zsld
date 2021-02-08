@@ -115,26 +115,19 @@ if (defined("ERROR")) {
                           }
 
                           $http_tracking = new Rest(
-                            function(data) {
-                              var person;
-                              //if (REGISTERED_DEVICE > 0) {
-                              //  person = respdataonse.objects[0];
-                              //} else {
-                                //device = JSON.parse(data);
-                                person = data;
-                              //}
-                              console.info('Registration successful ', person);
+                            function(response) {
+                              console.info('Registration successful ', response);
                               passed('Registration successful');
 
                               var registration = '';
                               registration += '    <div class="row">';
                               registration += '        <div class="col-xs-4 col-md-4">Geräte Registration</div>';
-                              registration += '        <div id="zsld-tracking-registration" class="col-xs-8 col-md-8">' + (person && person.display ? person.display : "") + '</div>';
+                              registration += '        <div id="zsld-tracking-registration" class="col-xs-8 col-md-8">' + (response && response.data ? response.data : "") + '</div>';
                               registration += '    </div>';
                               $('#zsld-tracking-success').html(registration);
 
-                              if (person && person.executingdevice) {
-                                $('#zsld-tracking-device').text(person.executingdevice);
+                              if (response && response.executingdevice) {
+                                $('#zsld-tracking-device').text(response.executingdevice);
                               }
 
                               if (REGISTERED_DEVICE < 1) {
@@ -156,8 +149,8 @@ if (defined("ERROR")) {
                               }
 
                             },
-                            function(data) {
-                              console.error('Error attempting to register ', data);
+                            function(response) {
+                              console.error('Error attempting to register ', response);
                               failed('Error attempting to register');
 
                               var registration = '';
@@ -236,55 +229,56 @@ if (defined("ERROR")) {
                               person.properties.notifymc = $("#zsld-tracking-check-kp-input").is(':checked');
 
                               $http_otpauthqrcode = new Rest(
-                                function(data) {
-                                  console.info('OTPAuth QrCode created ', data);
+                                function(response) {
+                                  console.info('OTPAuth QrCode created ', response);
                                   passed('OTPAuth QrCode created');
 
                                   $('#zsld-tracking-error').hide();
 
                                   $("#zsld-tracking-pid").val( "" );
-                                  $("#zsld-tracking-key").val( data.key );
+                                  $("#zsld-tracking-key").val( response.properties.key );
 
-                                  if ( data.errno == 0 ) {
+                                  if ( response.errno == 0 ) {
                                     var otp = '';
                                     otp += '    <div id="zsld-tracking-otp-group" class="input-group" style="margin-bottom: 15px; border-radius: 4px; width: calc(100vw - 42px);">';
                                     otp += '        <span class="input-group-btn" style="font-size: 14px;">';
                                     otp += '            <button id="zsld-tracking-otp-button" class="btn btn-success" type="button">OK</button>';
                                     otp += '        </span>';
                                     otp += '        <input id="zsld-tracking-otp-input" type="text" class="form-control" placeholder="Code  …">';
+                                    otp += '        <span class="input-group-btn" style="font-size: 14px;">';
 
-                                    if (data.OTPAuthURL != "" || data.OTPAuthQRCode != "") {
-                                      otp += '        <span class="input-group-btn" style="font-size: 14px;">';
-                                      if (data.OTPAuthURL != "") {
-                                        otp += '            <button id="zsld-tracking-otpurl-button" class="btn btn-primary" type="button" onclick="(function(){ window.location.href = ' + "'" + data.OTPAuthURL + "'" + '; })()">Authenticator öffnen</button>';
+                                    if (response.properties.OTPAuthURL != "" || response.properties.OTPAuthQRCode != "") {
+                                      if (response.properties.properties.OTPAuthURL != "") {
+                                        otp += '            <button id="zsld-tracking-otpurl-button" class="btn btn-primary" type="button" onclick="(function(){ window.location.href = ' + "'" + data.properties.OTPAuthURL + "'" + '; })()">Authenticator öffnen</button>';
                                       }
-                                      if (data.OTPAuthQRCode != "") {
+                                      if (response.properties.OTPAuthQRCode != "") {
                                         otp += '            <button id="zsld-tracking-otpqrcode-button" class="btn btn-primary" type="button" data-toggle="modal" data-target="#zsld-tracking-otpqrcode-modal">Authenticator QR Code</button>';
                                       }
-                                      $http_otpauthsms = new Rest(
-                                        function(data) {
-                                          console.info('OTPAuth SMS sent ', data);
-                                          passed('OTPAuth SMS sent');
-
-                                          var authentication = '';
-                                          authentication += '    <div class="row">';
-                                          authentication += '        <div class="col-xs-4 col-md-4">Authentifizierung</div>';
-                                          authentication += '        <div id="zsld-tracking-authentication" class="col-xs-8 col-md-8">SMS wurde gesendet</div>';
-                                          authentication += '    </div>';
-                                          $('#zsld-tracking-success').html(authentication);
-                                        },
-                                        function(data) {
-                                          console.error('Error attempting to send the OTPAuth SMS ', data);
-                                          failed('Error attempting to send the OTPAuth SMS');
-
-                                          $('#zsld-tracking-error').text("Das SMS konnte nicht gesendet werden.");
-                                          $('#zsld-tracking-error').show();
-                                        }
-                                      );
-                                      otp += '            <button id="zsld-tracking-otpsms-button" class="btn btn-primary" type="button">Authenticator Code per SMS senden</button>';
-                                      otp += '        </span>';
                                     }
 
+                                    $http_otpauthsms = new Rest(
+                                      function(response) {
+                                        console.info('OTPAuth SMS sent ', response);
+                                        passed('OTPAuth SMS sent');
+
+                                        var authentication = '';
+                                        authentication += '    <div class="row">';
+                                        authentication += '        <div class="col-xs-4 col-md-4">Authentifizierung</div>';
+                                        authentication += '        <div id="zsld-tracking-authentication" class="col-xs-8 col-md-8">SMS wurde gesendet</div>';
+                                        authentication += '    </div>';
+                                        $('#zsld-tracking-success').html(authentication);
+                                      },
+                                      function(response) {
+                                        console.error('Error attempting to send the OTPAuth SMS ', response);
+                                        failed('Error attempting to send the OTPAuth SMS');
+
+                                        $('#zsld-tracking-error').text("Das SMS konnte nicht gesendet werden.");
+                                        $('#zsld-tracking-error').show();
+                                      }
+                                    );
+
+                                    otp += '            <button id="zsld-tracking-otpsms-button" class="btn btn-primary" type="button">Authenticator Code per SMS senden</button>';
+                                    otp += '        </span>';
                                     otp += '    </div>';
                                     $("#zsld-tracking-settings").append(otp);
 
@@ -296,15 +290,14 @@ if (defined("ERROR")) {
                                         "properties": evt.data.person.properties
                                       }));
                                     });
-                                    if (data.OTPAuthURL != "" || data.OTPAuthQRCode != "") {
-                                      $("#zsld-tracking-otpsms-button").on( "click", {person: person}, function(evt) {
-                                        $http_otpauthsms.post(URL_OTPAUTHSMS, JSON.stringify({
-                                          "id": evt.data.person.properties["IPN"]
-                                        }));
-                                      });
-                                    }
 
-                                    if (data.OTPAuthQRCode != "") {
+                                    $("#zsld-tracking-otpsms-button").on( "click", {person: person}, function(evt) {
+                                      $http_otpauthsms.post(URL_OTPAUTHSMS, JSON.stringify({
+                                        "id": evt.data.person.properties["IPN"]
+                                      }));
+                                    });
+
+                                    if (response.properties.OTPAuthQRCode != "") {
                                       var otpqrcode = '';
                                       otpqrcode += '    <div id="zsld-tracking-otpqrcode-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="optAuthQRCode">';
                                       otpqrcode += '        <div class="modal-dialog modal-sm" role="document">';
@@ -314,7 +307,7 @@ if (defined("ERROR")) {
                                       otpqrcode += '                    <h4 class="modal-title" id="optAuthQRCode">Authenticator QR Code</h4>';
                                       otpqrcode += '                </div>';
                                       otpqrcode += '                <div class="modal-body" style="text-align: center;">';
-                                      otpqrcode += '                    <img src="data:image/png;base64,' + data.OTPAuthQRCode + '">';
+                                      otpqrcode += '                    <img src="data:image/png;base64,' + response.properties.OTPAuthQRCode + '">';
                                       otpqrcode += '                </div>';
                                       otpqrcode += '            </div>';
                                       otpqrcode += '        </div>';
@@ -323,8 +316,8 @@ if (defined("ERROR")) {
                                     }
                                   }
                                 },
-                                function(data) {
-                                  console.error('Error attempting to create the OTPAuth QrCode ', data);
+                                function(response) {
+                                  console.error('Error attempting to create the OTPAuth QrCode ', response);
                                   failed('Error attempting to create the OTPAuth QrCode');
 
                                   $('#zsld-tracking-error').text("Dein persönlicher Schlüssel ist ungültig");
@@ -332,17 +325,13 @@ if (defined("ERROR")) {
                                 }
                               );
 
-                              console.debug('OTPAuth Person ', person);
-                              //var pid = $("#zsld-tracking-pid").val();
-                              //console.debug('OTPAuth ID ', pid);
-                              //var Schlüssel = $("#zsld-tracking-key").val();
-                              //console.debug('OTPAuth Schlüssel ', Schlüssel);
+                              //console.debug('OTPAuth Person ', person);
 
                               if ($("#zsld-tracking-pid").val() && $("#zsld-tracking-key").val()) {
                                 $http_otpauthqrcode.post(URL_OTPAUTHQRCODE, JSON.stringify({
-                                  "pid": $("#zsld-tracking-pid").val(),
+                                  "id": $("#zsld-tracking-pid").val(),
                                   "key": $("#zsld-tracking-key").val(),
-                                  "username": person.properties["Name"] + person.properties["Vorname"],
+                                  "display": person.properties["Name"] + person.properties["Vorname"],
                                   "properties": person.properties
                                 }));
                               } else {
@@ -440,8 +429,8 @@ if (defined("ERROR")) {
                                   notifymc += '    </div>';
                                   $('#zsld-tracking-success').html(notifymc);
                                 },
-                                function(data) {
-                                  console.error('Error attempting to register your device ', data);
+                                function(response) {
+                                  console.error('Error attempting to register your device ', response);
                                   failed('Error attempting to register your device');
 
                                   var notifymc = '';

@@ -71,6 +71,8 @@ $logoutButton .= '    if ($("#zsld-login-button-ok").attr("data-dismiss") == "mo
 $logoutButton .= '        $("#zsld-login-button-ok").text("Ausloggen").attr("type", "submit").removeAttr("data-dismiss").removeData("dismiss").toggleClass("btn-success", true).toggleClass("btn-defaull", false);';
 $logoutButton .= '</script>';
 
+header('Content-Type: application/json');
+
 DeviceTAC::restore(  DeviceTAC::read( 'expiration' ) );
 
 if ( !DeviceTAC::read( 'auth' ) ) {
@@ -119,7 +121,7 @@ if ( !DeviceTAC::read( 'auth' ) ) {
 
                         $message .= $debug;
 
-                        die($message);
+                        die(json_encode($message, JSON_PRETTY_PRINT));
                     }
                 }
 
@@ -161,13 +163,12 @@ if ( !DeviceTAC::read( 'auth' ) ) {
 
             $message .= $debug;
 
-            die($message);
+            die(json_encode($message, JSON_PRETTY_PRINT));
         }
 
     }
 
     $message .= $userForm;
-
     $message .= $debug;
 
 } else {
@@ -206,7 +207,7 @@ if ( !DeviceTAC::read( 'auth' ) ) {
     $message .= $userForm;
     $message .= $debug;
 }
- 
+
 if ( !DeviceTAC::read( 'auth' ) ) {
     /**
      * Setze den Status zurück auf ausgeloggt.
@@ -216,7 +217,7 @@ if ( !DeviceTAC::read( 'auth' ) ) {
     /**
      * Zeige das Anmeldeformular.
      */
-    echo $message;
+    echo json_encode($message, JSON_PRETTY_PRINT);
 
     // Programm wird hier beendet, denn der Benutzer ist noch nicht eingeloggt.
     exit;
@@ -229,7 +230,7 @@ if ( !DeviceTAC::read( 'auth' ) ) {
     /**
      * Zeige Erfolgsmeldung.
      */
-    echo $message;
+    echo json_encode($message, JSON_PRETTY_PRINT);
 
     // Programm wird hier weitergeführt, denn der Benutzer ist eingeloggt.
 }

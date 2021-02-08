@@ -215,22 +215,30 @@ class DeviceTAC {
         }
     }
     public static function getuser($person) {
-        $user = null;
+        $id = (int)json_decode( $person, false )->id;
+        $User = null;
         $duration = 0;
         $expiration = "";
 
         /**
+         * Prüfe ob ein impersonate erfolgt ist.
+         */
+        if ( self::read( 'impersonated' ) > 0 ) {
+            $id = (int)self::read( 'impersonated' );
+        }
+
+        /**
          * Die Angaben über den Benutzer einlesen.
          */
-        if ( $userdb = ObjectStore::parse( DATA_PATH . DATASTORE_ACCESS . '.json' ) ) {
-            $users = $userdb->list( 0, array( 'rid' => json_decode( $person, false )->id /* $response[0]['properties']['IPN'] */ ) );
-            if ( !empty( $users ) ) {
+        if ( $UserDB = ObjectStore::parse( DATA_PATH . DATASTORE_ACCESS . '.json' ) ) {
+            $Users = $UserDB->list( 0, array( 'rid' => $id ) );
+            if ( !empty( $Users ) ) {
                 //User found in UserDB, session valid. Data access granted
-                $user = $users[0];
+                $User = $Users[0];
 
                 $today = new DateTime('now');
-                $decision = new DateTime($user['decision']);
-                $decision->add(DateInterval::createFromDateString($user['properties']['Periode']));
+                $decision = new DateTime($User['decision']);
+                $decision->add(DateInterval::createFromDateString($User['properties']['Periode']));
 
                 $duration = ($decision->getTimestamp() - $today->getTimestamp());
                 
@@ -240,7 +248,7 @@ class DeviceTAC {
                     $expiration = $duration . " seconds";
                 }
 
-                self::debug("ZSLDDEBUG_DEVICETAC_BUILD_4", json_decode( '{ "decision": "' . $user['decision'] . '", "periode": "' . $user['properties']['Periode'] . '", "expiration": "' . $expiration . '", "user": ' . json_encode( $user ) . ' }') );
+                self::debug("ZSLDDEBUG_DEVICETAC_BUILD_4", json_decode( '{ "decision": "' . $User['decision'] . '", "periode": "' . $User['properties']['Periode'] . '", "expiration": "' . $expiration . '", "user": ' . json_encode( $User ) . ' }') );
             } else {
                 //Can't find user in UserDB. Data access prohibited
                 self::debug("ZSLDDEBUG_DEVICETAC_BUILD_3",  json_decode( '{ "error": "Der Benutzer konnte in der Benutzer-Datenbank nicht gefunden werden. Der Zugriff wird verweigert." }' ) );
@@ -250,7 +258,7 @@ class DeviceTAC {
             self::debug("ZSLDDEBUG_DEVICETAC_BUILD_2",  json_decode( '{ "error": "Die Benutzer-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert." }' ) );
         }
 
-        return array( "user" => $user, "duration" => $duration, "expiration" => $expiration );
+        return array( "user" => $User, "duration" => $duration, "expiration" => $expiration );
     }
     public static function build($delete, $methods) { 
         $self = new self();
@@ -261,8 +269,8 @@ class DeviceTAC {
             setcookie( "deviceTAC", $_COOKIE["deviceTAC"], time() - 42000, "/", "zso-aargausued.ch", true, true);
         }
 
-        $user = null;
-        $person = null;
+        $User = null;
+        $Person= null;
 
         self::session("");
         define( "DEVICE_TAC", session_id());
@@ -271,15 +279,15 @@ class DeviceTAC {
         } else {
             $expiration = "-10 seconds";
         }
-        $person = self::read( 'person' );
+        $Person= self::read( 'person' );
         self::abort();
 
-        if ( $person ) {
-            $entry = self::getuser( $person );
-            $user = $entry['user'];
-            $expiration = $entry['expiration'];
+        if ( $Person) {
+            $rec = self::getuser( $Person);
+            $User = $rec['user'];
+            $expiration = $rec['expiration'];
         } else {
-            $person = $self->registerDevice();
+            $Person= $self->registerDevice();
             // $expiration = "+" . SESSION_MIN_DELAYLOCKOUT . " seconds";
         }
 
@@ -287,8 +295,8 @@ class DeviceTAC {
         self::restore( $expiration );
         self::write( 'last_access', new DateTime('now') );
         self::write( 'expiration', $expiration );
-        self::write( 'person', $person );
-        self::write( 'user', $user );
+        self::write( 'person', $Person);
+        self::write( 'user', $User );
         self::commit();
 
 

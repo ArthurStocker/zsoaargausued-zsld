@@ -17,6 +17,7 @@
                             <i class="fa fa-times fa-1x" aria-hidden="true"></i>
                         </button>
                         <h4 id="modal-label-login" class="modal-title">Login</h4>
+                        <h6 id="modal-label-login-impersonate" style="color: red;"><span id="zsld-login-impersonated" style="visibility: hidden;">impersonated to <span id="zsld-login-impersonated-person"></span></span></h6>
                     </div>
 
                     <div class="modal-body">

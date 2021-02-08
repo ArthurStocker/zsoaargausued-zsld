@@ -12,18 +12,18 @@ if (new Plugins('login')) {
     // Execute login
     Plugins.login.exec = function(e) {
         $http_login = new Rest(
-            function(data) {
-                console.info('Login response ', data);
+            function(response) {
+                console.info('Login response ', response);
                 passed('Login response ');
-                $('#zsld-login').html(data);
+                $('#zsld-login').html(response.properties.ui);
             },
-            function(data) {
-                console.error('Error attempting to access the data, please login ', data);
+            function(response) {
+                console.error('Error attempting to access the data, please login ', response);
                 failed('Error attempting to access the data, please login');
-                $('#zsld-login').html(data);
+                $('#zsld-login').html(response.properties.ui);
             }
         );
-        $http_login.get("/map/api/login");
+        $http_login.get("/map/api/update?auth=login" /* "/map/api/login" */ );
     }
 
     // Toggle login

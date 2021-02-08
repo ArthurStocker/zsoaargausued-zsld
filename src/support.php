@@ -123,9 +123,17 @@ if (defined("ERROR")) {
                                                                         foreach ( array_keys( $devicesdetails ) as $devicedetails ) {
                                                                             if ( $devicedetails != "0" && $devicedetails == $_POST['selecteddevicetac'] ) { 
                                                                                 echo "<pre>" . $devicesdetails[$devicedetails]  . "</pre><br />\n";
+                                                                                if ( isset( $_POST['closerequest'] ) && $_POST['closerequest'] == "on" ) {
+                                                                                    unset( $devicesdetails[$devicedetails] );
+                                                                                    echo "<b>Die Supportanfrage wurde gelöscht.</b><br />\n";
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
+                                                                }
+                                                                if ( !file_put_contents( DATA_PATH  . 'support.txt', json_encode( $devicesdetails, JSON_PRETTY_PRINT ) ) ) {
+                                                                    echo "<b>Fehler: Die Supportanfrage konnte nicht gelöscht werden!</b><br />\n";
+                                                                    $devicesdetails = '';
                                                                 }
                                                                 ?>
                                                             </div>
@@ -175,7 +183,25 @@ if (defined("ERROR")) {
                                 <!-- Tab pane 'settings' -->
                                 <div id="zsld-support-tab-settings" role="tabpanel" class="tab-pane">
                                     <div id="zsld-support-settings" class="form-check"><br />
-                                        <pre>  {settings} </pre>
+                                        <div class="panel panel-default">
+                                            <!-- Default panel contents -->
+                                            <div class="panel-heading">
+                                                Allgemeine Einstellungen
+                                            </div>
+                                            <div class="panel-body">
+                                                <ul class="list-group list-group-flush">
+                                                    <li class="list-group-item">
+                                                        SMS User: *****
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        SMS Passwort: *****
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        SMS Serviceurl: <?php echo SMS_URL; ?>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- /# Tab pane 'settings' -->
@@ -189,7 +215,6 @@ if (defined("ERROR")) {
                                 <!-- Tab pane 'request' -->
                                 <div id="zsld-support-tab-request" role="tabpanel" class="tab-pane active">
                                     <div id="zsld-support-request" class="form-check"><br />
-                                        <pre> {} </pre>
                                         <?php
                                         /**
                                          * 
@@ -238,8 +263,10 @@ if (defined("ERROR")) {
                                                         <ul class="list-group list-group-flush">
                                                             <li class="list-group-item">
                                                                 Geräteangaben speichern und Supportanfrage senden
-                                                                <input id="zsld-support-checkbox-request" name="request" aria-label="Checkbox request" type="checkbox" class="switch" unchecked>
-                                                                <label for="zsld-support-checkbox-request"></label>
+                                                                <label for="zsld-support-checkbox-request" class="switch">
+                                                                    <input id="zsld-support-checkbox-request" name="request" aria-label="Checkbox request" type="checkbox" class="switch" unchecked>
+                                                                    <span class="slider round"></span>
+                                                                </label>
                                                             </li>
                                                         </ul>
                                                         <button id="zsld-support-button-submit-request" class="btn btn-success confirm" type="submit">Senden</button>
@@ -255,7 +282,6 @@ if (defined("ERROR")) {
                                 <!-- Tab pane 'settings' -->
                                 <div id="zsld-support-tab-settings" role="tabpanel" class="tab-pane">
                                     <div id="zsld-support-settings" class="form-check"><br />
-                                        <pre> {} </pre>
                                         <?php
                                             $keys = [];
                                             if ( $keys = json_decode( file_get_contents( DATA_PATH  . 'registration.txt' ) ) ) {
