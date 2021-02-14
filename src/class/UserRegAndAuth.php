@@ -160,26 +160,38 @@ class UserRegAndAuth {
                 /**
                  * Der Benutzername und das Passwort wurden angegeben.
                  */
-                if ( DeviceTAC::read( 'person' ) || (isset($post["overwrite"]) && $post["overwrite"] == "impersonate" && isset($post["id"]) && $post["id"] != "") ) {
+                if ( DeviceTAC::read( 'person' ) || (isset($post["apikey"]) && $post["apikey"] != "" && isset($post["id"]) && $post["id"] != "") ) {
                     if ( DeviceTAC::read( 'person' ) ) {
                         $User = DeviceTAC::getuser( DeviceTAC::read( 'person' ) )['user'];
                     }
 
-                    if (isset($post["overwrite"]) && $post["overwrite"] == "impersonate" && isset($post["id"]) && $post["id"] != "") { // hier soll impersonate durch api key ersetzt werden
+                    if (isset($post["apikey"]) && $post["apikey"] != "" && isset($post["id"]) && $post["id"] != "") {
                         $rec = DeviceTAC::getuser( '{ "id": ' . (int)$post["id"] . ' }' );
 
-                        $User = $rec['user'];
-                        DeviceTAC::write( 'impersonated', (int)$post["id"] );
+                        if ($post["apikey"] == $rec['user']['properties']['APIKey']) {
+                            $User = $rec['user'];
+                            DeviceTAC::write( 'impersonated', (int)$post["id"] );
 
-                        DeviceTAC::commit();
-                        DeviceTAC::restore( $rec['expiration'] );
-                    }
+                            DeviceTAC::commit();
+                            DeviceTAC::restore( $rec['expiration'] );
+                        } else {
+                            /**
+                             * Der APIkey ist nicht ungültig.
+                             */
+                            $userForm = $this->msg();
+                            $message .= '<b>Login fehlgeschlagen.</b>';
+                
+                            $message .= $this->log($post);
+                
+                            return array("data" => "authentication", "properties" => array("auth" => DeviceTAC::read( 'auth' ), "ui" => $message), "errno" => 403, "error" => "Der APIkey ist nicht ungültig.");
+                        }
+                    } 
 
                     DeviceTAC::write( 'user', $User );
                     DeviceTAC::write( 'secret', DeviceTAC::read( 'user' )['properties']['Secret'] );
                     DeviceTAC::write( 'password', DeviceTAC::read( 'user' )['properties']['Passwort'] );
 
-                    if ( (int)DeviceTAC::read( 'user' )['properties']['Rechte']['Optionen'] == 255 ) {
+                    if ( DeviceTAC::read( 'user' ) && (int)DeviceTAC::read( 'user' )['properties']['Rechte']['Optionen'] == 255 ) {
                         /**
                          * Der Benutzer ist für das login berechtigt.
                          */
@@ -191,7 +203,7 @@ class UserRegAndAuth {
                                 /**
                                  * Das Passwort ist korrekt.
                                  */
-                                // ipersonate sollte hier sein.
+                                // TODO: ipersonate hier
                                 
                                 // update passwort sowie user objekt und speichere die daten in der users db
                                 if( password_needs_rehash( DeviceTAC::read( 'password' ), PASSWORD_DEFAULT ) ) {
@@ -451,8 +463,10 @@ class UserRegAndAuth {
             } else {
                 $this->transaction['data'] = "failed";
                 $this->transaction['properties'] = [];
+                /*
                 $this->transaction['properties']['person'] = $User;
                 $this->transaction['properties']['data'] = $data;
+                */
                 $this->transaction['executingdevice'] = session_id();
                 $this->transaction['errno'] = 422;
                 $this->transaction['error'] = "method not defined";
@@ -493,6 +507,7 @@ class UserRegAndAuth {
                         $User['properties']['Periode'] = "+" . USER_AUTO_LOCKOUT . " days";
     
                         if ( $Person["duration"] <= 0 ) {
+                            $User['properties']['Rechte']['Imitieren'] = 0;
                             $User['properties']['Rechte']['Optionen'] = 254;
                             $User['properties']['Rechte']['Berichte'] = 0;
                         }
@@ -511,8 +526,10 @@ class UserRegAndAuth {
                     $User->display = $data->properties->Name.$data->properties->Vorname;
                     $User->properties = new stdClass();
                     $User->properties->Rechte = new stdClass();
+                    $User->properties->Rechte->Imitieren = 0;
                     $User->properties->Rechte->Optionen = 254;
                     $User->properties->Rechte->Berichte = 0;
+                    $User->properties->APIkey = password_hash( $this->randomPassword(),  PASSWORD_DEFAULT );
                     $User->properties->Secret = DeviceTAC::read( 'secret' );
                     $User->properties->Periode = "+" . USER_AUTO_LOCKOUT . " days";
                     $User->properties->Passwort = DeviceTAC::read( 'password' );
@@ -541,6 +558,60 @@ class UserRegAndAuth {
         }
 
         return $this->transaction;
+    }
+
+    public function randomPassword() {
+        $pass = array(); //remember to declare $pass as an array
+        $alphaLength = 7;
+        $d = rand(0, $alphaLength);
+        do {
+            $s = rand(0, $alphaLength);
+        } while ( $s === $d );
+        for ($i = 0; $i < 8; $i++) {
+            if ( $i === $d ) {
+                $pass[] = $this->randomNumber();
+            } else if ( $i === $s ) {
+                $pass[] = $this->randomSpecChar(); 
+            } else {
+                if ( rand(0, 1) === 1 )  {
+                    $pass[] = $this->randomUpper();
+                } else {
+                    $pass[] = $this->randomLower();
+                }
+            }
+        }
+        return implode($pass); //turn the array into a string
+    }
+        
+    private function randomUpper() {
+        $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $pass = array(); //remember to declare $pass as an array
+        $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+        $n = rand(0, $alphaLength);
+        return $alphabet[$n]; //turn the array into a string
+    }
+    private function randomLower() {
+        $alphabet = 'abcdefghijklmnopqrstuvwxyz';
+        $pass = array(); //remember to declare $pass as an array
+        $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+        $n = rand(0, $alphaLength);
+        return $alphabet[$n]; //turn the array into a string
+    }
+    
+    private function randomNumber() {
+        $alphabet = '1234567890';
+        $pass = array(); //remember to declare $pass as an array
+        $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+        $n = rand(0, $alphaLength);
+        return $alphabet[$n]; //turn the array into a string
+    }
+    
+    private function randomSpecChar() {
+        $alphabet = '+*%&$?';
+        $pass = array(); //remember to declare $pass as an array
+        $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+        $n = rand(0, $alphaLength);
+        return $alphabet[$n]; //turn the array into a string
     }
 }
 ?>

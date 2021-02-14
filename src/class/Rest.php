@@ -93,7 +93,10 @@ class Rest {
                     }
                     if ($type === 'system') {
                         $response = SystemProperty::build( $xlsx->rows($id), ($id == 2) );
-                    }
+                    } 
+                    if ($type === 'forms') {
+                        $response = $xlsx->rows($id);
+                    } 
                 } else {
                     $response = SimpleXLSX::parseError();
                 }
