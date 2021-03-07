@@ -35,7 +35,7 @@ class Style {
                 $object->radius = $row['Radius'];
                 break;
         }
-        $object->fill = $this->fill($row);;
+        $object->fill = $this->fill($row);
         $object->stroke = $this->stroke($row);
 
         return $object;

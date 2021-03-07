@@ -1,6 +1,4 @@
 <?php
-$TEST = FALSE;
-$DEBUG = TRUE;
 $GLOBALS["SUPPORT"] = [];
 
 require_once 'class/DeviceTAC.php';
@@ -9,17 +7,32 @@ DeviceTAC::build(TRUE, "GET, POST");
 
 
 require_once 'config/setup.php';
-require_once 'class/UserRegAndAuth.php';
+
 
 $setup = new Setup();
-$users = new UserRegAndAuth();
 
-$users->init();
+
+
+
+
+
+
+
+
+
 
 
 if (defined("ERROR")) {
 
 } else {
+    $TEST = FALSE;
+    $DEBUG = TRUE;
+
+    require_once 'class/UserRegAndAuth.php';
+
+    $users = new UserRegAndAuth();
+
+    $users->init();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,6 +64,7 @@ if (defined("ERROR")) {
         <script src="https://cdn.datatables.net/v/bs4/jq-3.3.1/jszip-2.5.0/dt-1.10.23/b-1.6.5/b-colvis-1.6.5/b-html5-1.6.5/sb-1.0.1/sp-1.2.2/sl-1.3.1/datatables.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
         
+        <script src="/map/class/Rest.js"></script>
 
         <!-- Wrapper -->
         <div id="wrapper">
@@ -63,6 +77,11 @@ if (defined("ERROR")) {
                     <div id="support-container" lass="form-horizontal collapse in" aria-expanded="true" style="">
                         <!-- Nav tabs -->
                         <ul id="zsld-support-tab-nav" class="nav nav-tabs" role="tablist">
+                            <?php
+                            /**
+                             * public tabs
+                             */
+                            ?>
                             <li role="presentation" class="nav-item active">
                                 <a id="zsld-support-action-request" href="#zsld-support-tab-request" class="nav-link active" aria-controls="zsld-support-tab-request" role="tab" data-toggle="tab"  data-list="zsld-support-list-request" data-url="' + last_url + '">Supportanfrage</a>
                             </li>
@@ -71,7 +90,10 @@ if (defined("ERROR")) {
                             </li>
                             <?php
                             /**
-                             * Tabs if logged-in
+                             * /# public tabs
+                             */
+                            /**
+                             * private tabs if logged-in
                              */
                             if ( DeviceTAC::read( 'auth' ) ) {
                             ?>
@@ -81,7 +103,7 @@ if (defined("ERROR")) {
                             <?php
                             }
                             /**
-                             * /# Tabs if logged-in
+                             * /# private tabs if logged-in
                              */
                             ?>
                         </ul>
@@ -535,190 +557,146 @@ if (defined("ERROR")) {
 
                                         <script type="text/javascript" src="lib/bootstrap-treeview/js/bootstrap-treeview.js"></script>
                                         <script type="text/javascript">
+                                        
+                                            var FORM_ID = 1
 
-                                            var definition = [
-                                                [
-                                                    "Feldname",
-                                                    "Icon",
-                                                    "Bezeichnung/Text",
-                                                    "Wert",
-                                                    "Typ",
-                                                    "Platzhalter/Information",
-                                                    "Status",
-                                                    "Action",
-                                                    "ActionTyp",
-                                                    "ActionBezeichnung",
-                                                    "ActionScript",
-                                                    "Bezeichnungsbreite%"
-                                                ],
-                                                [
-                                                    "vorname_name",
-                                                    "fas fa-address-card",
-                                                    "",
-                                                    "Vorname …_Name …",
-                                                    "text_text",
-                                                    "Vorname …_Name …",
-                                                    "disabled",
-                                                    "resetinput",
-                                                    "btn-danger",
-                                                    "<span class=\"fas fa-trash fa-fw\"></span>",
-                                                    "",
-                                                    ""
-                                                ],
-                                                [
-                                                    "mobilnummer",
-                                                    "fas fa-mobile",
-                                                    "",
-                                                    "Mobilnummer …",
-                                                    "text",
-                                                    "Mobilnummer …",
-                                                    "enabled",
-                                                    "resetinput",
-                                                    "btn-danger",
-                                                    "<span class=\"fas fa-trash fa-fw\"></span>",
-                                                    "",
-                                                    ""
-                                                ],
-                                                [
-                                                    "pid",
-                                                    "fas fa-key",
-                                                    "",
-                                                    "PID …",
-                                                    "text",
-                                                    "PID …",
-                                                    "enabled",
-                                                    "resetinput",
-                                                    "btn-danger",
-                                                    "<span class=\"fas fa-trash fa-fw\"></span>",
-                                                    "",
-                                                    ""
-                                                ],
-                                                [
-                                                    "periode",
-                                                    "fas fa-user-clock",
-                                                    "",
-                                                    "Periode …",
-                                                    "text",
-                                                    "Periode …",
-                                                    "enabled",
-                                                    "resetinput",
-                                                    "btn-danger",
-                                                    "<span class=\"fas fa-trash fa-fw\"></span>",
-                                                    "",
-                                                    ""
-                                                ],
-                                                [
-                                                    "userid",
-                                                    "fas fa-id-badge",
-                                                    "",
-                                                    "Benutzer ID …",
-                                                    "text",
-                                                    "Benutzer ID …",
-                                                    "enabled",
-                                                    "resetinput",
-                                                    "btn-danger",
-                                                    "<span class=\"fas fa-trash fa-fw\"></span>",
-                                                    "",
-                                                    ""
-                                                ],
-                                                [
-                                                    "password",
-                                                    "fas fa-fingerprint",
-                                                    "",
-                                                    "Passwort …",
-                                                    "text",
-                                                    "Passwort …",
-                                                    "disabled",
-                                                    "resetinput",
-                                                    "btn-danger",
-                                                    "<span class=\"fas fa-trash fa-fw\"></span>",
-                                                    "",
-                                                    ""
-                                                ],
-                                                [
-                                                    "apikey",
-                                                    "fab fa-keycdn",
-                                                    "",
-                                                    "API Key …",
-                                                    "text",
-                                                    "API Key …",
-                                                    "disabled",
-                                                    "resetinput",
-                                                    "btn-danger",
-                                                    "<span class=\"fas fa-trash fa-fw\"></span>",
-                                                    "",
-                                                    ""
-                                                ],
-                                                [
-                                                    "frage1",
-                                                    "far fa-question-circle",
-                                                    "Hast du alle Angaben eingegeben?",
-                                                    "Ja,Nein",
-                                                    "radio",
-                                                    "Ja,Nein",
-                                                    "enabled",
-                                                    "",
-                                                    "",
-                                                    "",
-                                                    "",
-                                                    50
-                                                ]
-                                            ];
+                                            var URL_FORMS = "https://zso-aargausued.ch/map/api/read?type=forms&object=formulare&id=0";
+                                            $http_forms = new Rest(
+                                                function(response) {
+                                                    console.info('Forms ', response);
 
-                                            var defaultData =  [
-                                                {
-                                                    text: '<b>Arthur Stocker</b>',
-                                                    tags: ['1'],
-                                                    form:  definition,
-                                                    nodes: [
-                                                        {
-                                                            text: 'Rechte',
-                                                            tags: ['5'],
-                                                            icon: 'far fa-eye'
+                                                    var formsRec = [{}];
+
+                                                    for(var r = 1; r < response.length; r++) {
+                                                        formsRec.push({});
+                                                        for(var f = 0; f < response[0].length; f++) {
+                                                            formsRec[0][f] = response[0][f];
+                                                            formsRec[r][formsRec[0][f]] = response[r][f];
                                                         }
-                                                    ]
-                                                },
-                                                {
-                                                    text: 'Parent 2',
-                                                    tags: ['11'],
-                                                    form: ''
-                                                },
-                                                {
-                                                    text: 'Parent 3',
-                                                    tags: ['11'],
-                                                    form: ''
-                                                },
-                                                {
-                                                    text: 'Parent 4',
-                                                    tags: ['19'],
-                                                    form: '',
-                                                    color: '#ff5208'
-                                                }
-                                            ];
+                                                    }
 
-                                            function formLayout(definition) {
+                                                    console.info('Forms object ', formsRec);
+
+                                                    //URL_FORM = "https://zso-aargausued.ch/map/api/read?type=forms&object=formulare&id=1";
+                                                    var URL_FORM = "https://zso-aargausued.ch/map/api/read?type=forms&object=formulare&id=" + formsRec[FORM_ID]["Form"];
+                                                    //URL_DATA = "https://zso-aargausued.ch/map/api/read?type=objectstore&object=users&id=-1";
+                                                    var URL_DATA = formsRec[FORM_ID]["DataBinding"];
+
+                                                    console.info('Form URL ', URL_FORM);
+                                                    console.info('Data URL ', URL_DATA);
+                                                    
+                                                    $http_form = new Rest(
+                                                        function(response) {
+                                                            console.info('Form definition ', response);
+                                                            //passed('Users');
+
+                                                            var definition = response;
+                                                            
+                                                            $http_data = new Rest(
+                                                                function(response) {
+                                                                    console.info('Data ', response);
+
+                                                                    var transformedData;
+
+                                                                    $form_save = new Rest(
+                                                                        function(response) {
+                                                                            console.info('From data saved ', response);
+                                                                        },
+                                                                        function(response) {
+                                                                            console.error('Error attempting to save the formdata ', response);
+                                                                        }
+                                                                    );
+                                                                    function saveForm(formdata) {
+                                                                        $form_save.post(formsRec[FORM_ID]["DataStorage"], JSON.stringify( formdata || {} ));
+                                                                    }
+
+                                                                    if (formsRec[FORM_ID]["Navigation"]) {
+                                                                        if (formsRec[FORM_ID]["DataTransformator"] != "") {
+                                                                            var dataTransformator = new Function("request", "response", "form", "zsldDB", formsRec[FORM_ID]["DataTransformator"] + "\nreturn [request, response];");
+                                                                            transformedData = dataTransformator(response, undefined, definition, saveForm)[1];
+                                                                        } else {
+                                                                            transformedData = response;
+                                                                        }
+
+                                                                        $(function() {
+                                                                            var $formNavigationTree = initNavigationTree("users", "Suchen", "Search …", '#zsld-support-tab-content-user', transformedData, formsRec[FORM_ID]["DataTransformator"], formsRec[FORM_ID]["DataStorage"]);
+                                                                        });
+                                                                    } else {
+
+                                                                        $(function() {
+                                                                            var $formView = $('#zsld-support-tab-content-user').html(formLayout(definition, response.objects[0], formsRec[FORM_ID]["DataTransformator"], formsRec[FORM_ID]["DataStorage"]));
+                                                                        });
+                                                                    }
+                                                                },
+                                                                function(response) {
+                                                                    console.error('Error attempting to get the Data ', response);
+                                                                }
+                                                            );
+                                                            $http_data.get(URL_DATA, JSON.stringify({}));
+                                                        },
+                                                        function(response) {
+                                                            console.error('Error attempting to get the Form definition ', response);
+                                                        }
+                                                    );
+                                                    $http_form.get(URL_FORM, JSON.stringify({}));
+                                                },
+                                                function(response) {
+                                                    console.error('Error attempting to get the Forms ', response);
+                                                }
+                                            );
+                                            $http_forms.get(URL_FORMS, JSON.stringify({}));
+
+                                            function transformByKey(data, key, defaultValue) {
+                                                var value = data;
+                                                var hasKey = key.match(/\$\{(.*)\}/);
+
+                                                if (hasKey) {
+                                                    var keys = hasKey[1].split('.');
+                                                    var keyExists = true;
+                                                    for(var k = 0; k < keys.length; k++) {
+                                                        if (keyExists && value[keys[k]]) {
+                                                            value = value[keys[k]];
+                                                        } else {
+                                                            value = data;
+                                                            keyExists = false;
+                                                        }
+                                                    }
+                                                } else {
+                                                    keyExists = false;
+                                                }
+
+                                                if (!keyExists) {
+                                                    value = defaultValue;
+                                                }
+
+                                                return value;
+                                            }
+
+                                            function formViewLayout(definition, data, dataTransformatorString, dataStorageURL) {
+                                                var group = '';
                                                 var style = '';
                                                     style += '       <style type="text/css">';
-                                                    for(var s = 10; s < 90; s += 10) {
+                                                    for(var s = 10; s < 100; s += 10) {
                                                         style += '           .input-group>.input-group-prepend.zsld-fixed-width-' + s + ' {';
                                                         style += '               flex: 0 0 ' + s + '%;';
                                                         style += '           }';
+                                                        group += '           .input-group .input-group-text.zsld-fixed-width-' + s + ( s < 90 ? ',' : '' );
                                                     }
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-10,';
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-20,';
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-30,';
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-40,';
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-50,';
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-60,';
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-70,';
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-80,';
-                                                    style += '           .input-group .input-group-text.zsld-fixed-width-90 {';
+                                                    style += group;
+                                                    style += ' {';
                                                     style += '               width: 100%;';
                                                     style += '           }';
                                                     style += '       </style>';
                                                 var formOpen = '       <form>\n';
                                                 var formBody = '';
-                                                var formClose = '           <button id="zsld-form-save-button" class="btn btn-success" type="button">Speichern</button>\n       </form>\n';
+                                                var formClose = '           <button id="zsld-form-save-button" class="btn btn-success" type="button">Speichern</button>\n';
+                                                    formClose += '           <script type="text/javascript">\n';
+                                                    formClose += '                  var transformedData;\n';
+                                                    formClose += "                  var dataTransformator = new Function('request', 'response', 'form', 'zsldDB', `\n" + dataTransformatorString + "\nreturn [request, response];\n`);\n";
+                                                    formClose += '                  function transformator(response, form) { transformedData = dataTransformator(undefined, response, form, Rest)[0]; console.log(transformedData); }\n';
+                                                    formClose += '                  $("#zsld-form-save-button").on("click", { save: transformator }, function ( event ) { event.data.save($($(this).parent()).serializeArray(), $($(this).parent())) });\n';
+                                                    formClose += '           <\/script>\n';
+                                                    formClose += '       </form>\n';
                                                 
                                                 var formComponents = '';
 
@@ -739,18 +717,18 @@ if (defined("ERROR")) {
                                                             case "xyz":
                                                                 break;
                                                             case "radio":
-                                                                formComponents += '                    <div class="form-control">';
+                                                                formComponents += '                    <div class="form-control">\n';
                                                                 for(var o = 0; o < definition[i][5].split('_')[e].split(',').length; o++) {
-                                                                    
-                                                                    formComponents += '                        <div class="form-check form-check-inline">';
-                                                                    formComponents += '                            <input id="zsld-form-input-' + definition[i][0].split('_')[e] + '-' + (definition[i][5].split('_')[e].split(',')[o]).toLowerCase() + '" name="radioOption' + definition[i][0].split('_')[e] + '" class="form-check-input" value="' + (definition[i][3].split('_')[e].split(',')[o]).toLowerCase() + '" type="' + definition[i][4].split('_')[e] + '">';
-                                                                    formComponents += '                            <label class="form-check-label" for="zsld-form-input-' + definition[i][0].split('_')[e] + '">' + definition[i][5].split('_')[e].split(',')[o] + '</label>';
-                                                                    formComponents += '                        </div>';
+                                                                    formComponents += '                        <div class="form-check form-check-inline">\n';
+                                                                    formComponents += '                            <input id="zsld-form-input-' + definition[i][0].split('_')[e] + '-' + (definition[i][5].split('_')[e].split(',')[o]).toLowerCase() + '" name="' + definition[i][0].split('_')[e] + '" class="form-check-input" value="' + transformByKey(data, definition[i][3].split('_')[e].split(',')[o], definition[i][5].split('_')[e].split(',')[o]) + '" type="' + definition[i][4].split('_')[e] + '" ' + ( definition[i][6] == "disabled" || definition[i][6] == "readonly"  ? ( definition[i][6] == "disabled"  ? 'disabled' : 'readonly' ) : '' ) + '>\n';
+                                                                    formComponents += '                            <label class="form-check-label" for="zsld-form-input-' + definition[i][0].split('_')[e] + '">' + definition[i][5].split('_')[e].split(',')[o] + '</label>\n';
+                                                                    formComponents += '                        </div>\n';
                                                                 }
-                                                                formComponents += '                    </div>';
+                                                                formComponents += '                    </div>\n';
                                                                 break;
                                                             case "text":
-                                                                formComponents += '                    <input id="zsld-form-input-' + definition[i][0].split('_')[e] + '" class="form-control"' + (definition[i][3].split('_')[e] != "" ? ' value="' + definition[i][3].split('_')[e] + '"' : '') + ' type="' + definition[i][4].split('_')[e] + '" placeholder="' + definition[i][5].split('_')[e] + '" ' + ( definition[i][6] == "disabled" ? 'disabled="disabled"' : "" ) + '>\n';
+                                                            case "number":
+                                                                formComponents += '                    <input id="zsld-form-input-' + definition[i][0].split('_')[e] + '" name="' + definition[i][0].split('_')[e] + '" class="form-control"' + (definition[i][5].split('_')[e] != "" ? ' value="' + transformByKey(data, definition[i][3].split('_')[e], definition[i][5].split('_')[e]) + '"' : '') + ' type="' + definition[i][4].split('_')[e] + '" placeholder="' + definition[i][5].split('_')[e] + '" ' + ( definition[i][6] == "disabled" || definition[i][6] == "readonly"  ? ( definition[i][6] == "disabled"  ? 'disabled' : 'readonly' ) : '' ) + '>\n';
                                                                 break;
                                                             default:
                                                                 break;
@@ -807,14 +785,14 @@ if (defined("ERROR")) {
                                                 return formNavigation;
                                             }
 
-                                            var initTree = function(name, text, placeholder, parent, treeData) {
+                                            function initNavigationTree(name, text, placeholder, parent, treeData, dataTransformatorString, dataStorageURL) {
                                                 $(parent).html(formNavigation(name, text, placeholder));
 
                                                 var treeView = $('#zsld-navigation-treeview-' + name).treeview({
                                                     data: treeData,
                                                     levels: 1,
                                                     onNodeSelected: function(event, node) {
-                                                        $('#zsld-navigation-content-' + name).html(formLayout(node.form));
+                                                        $('#zsld-navigation-content-' + name).html(formViewLayout(node.form, node.data, dataTransformatorString, dataStorageURL));
                                                     },
                                                     onNodeUnselected: function (event, node) {
                                                         $('#zsld-navigation-content-' + name).html('');
@@ -852,10 +830,6 @@ if (defined("ERROR")) {
                                                 return treeView;
 
                                             };
-
-                                            $(function() {
-                                                var $usersTreeView = initTree("users", "Suchen", "Search …", '#zsld-support-tab-content-user', defaultData);
-                                            });
 
                                         </script>
 

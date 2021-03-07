@@ -7,8 +7,10 @@ DeviceTAC::build(TRUE, "GET, PUT, POST, DELETE, OPTIONS");
 
 
 require_once 'class/Rest.php';
+require_once 'class/UserRegAndAuth.php';
 
 $api = new Rest();
+$users = new UserRegAndAuth();
 
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
@@ -36,10 +38,14 @@ switch($requestMethod) {
 		}
 		break;
 	case 'POST':
+		$users->init();
 		if (array_key_exists('here', $_GET) && isset($_GET['id'])) {
 			$data = file_get_contents("php://input");
 			$transaction = $api->create($data , (string)$_GET['here'], (string)constant("DATASTORE_" . strtoupper($_GET['here'])), $_GET['id'], true);
-		}
+		} elseif (array_key_exists('otpauth', $_GET)) {
+			$data = file_get_contents("php://input");
+			$transaction = $users->otpauth($_GET, $data);
+		} 
 		if (isset($transaction)) {
 			if ($transaction['errno'] === 409) { 
 				header("HTTP/1.0 409 Conflict");

@@ -17,6 +17,7 @@ if ( DeviceTAC::read( 'person' ) && json_decode( DeviceTAC::read( 'person' ) )->
     $expiration = "-10 seconds";
     DeviceTAC::abort();
     DeviceTAC::restore( $expiration );
+    
     DeviceTAC::write( 'expiration', $expiration );
     DeviceTAC::commit();
 }

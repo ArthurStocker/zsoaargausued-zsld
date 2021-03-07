@@ -6,15 +6,18 @@ require_once 'class/DeviceTAC.php';
 DeviceTAC::build(TRUE, "GET, POST");
 
 
+
 require_once 'config/setup.php';
 
 $setup = new Setup();
+
 
 
 if ( DeviceTAC::read( 'person' ) && json_decode( DeviceTAC::read( 'person' ) )->display === "unbekannt" ) {
     $expiration = "-10 seconds";
     DeviceTAC::abort();
     DeviceTAC::restore( $expiration );
+    
     DeviceTAC::write( 'expiration', $expiration );
     DeviceTAC::commit();
 }

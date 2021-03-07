@@ -483,6 +483,8 @@ class UserRegAndAuth {
     }
 
     public function registration($get, $data) {
+        $api = new Rest();
+
         $data = json_decode($data, false);
 
         $otp = $data->otp;
@@ -497,7 +499,7 @@ class UserRegAndAuth {
             DeviceTAC::restore();
             DeviceTAC::write( 'person', $json );
     
-            if (array_key_exists('permissions', $get) && isset($get['permissions']) && (string)$get['permissions'] == "access") {
+            if (array_key_exists('type', $get) && isset($get['type']) && (string)$get['type'] == "access") {
                 $Person = DeviceTAC::getuser( $json );
     
                 if ( $Person["user"] ) {
@@ -518,11 +520,11 @@ class UserRegAndAuth {
                     $User['display'] = $User['data'];
                     unset($User['data']);
 
-                    $result = $api->update(json_encode($User, JSON_PRETTY_PRINT), (string)$User->type, (string)constant("DATASTORE_" . strtoupper($User->type)), $User->id);
+                    $result = $api->update(json_encode($User, JSON_PRETTY_PRINT), (string)$User['type'], (string)constant("DATASTORE_" . strtoupper($User['type'])), $User['id']);
                 } else {
                     $User = new stdClass();
                     $User->id = $data->id;
-                    $User->type = (string)$get['permissions'];
+                    $User->type = (string)$get['type'];
                     $User->display = $data->properties->Name.$data->properties->Vorname;
                     $User->properties = new stdClass();
                     $User->properties->Rechte = new stdClass();

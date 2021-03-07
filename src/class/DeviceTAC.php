@@ -1,7 +1,4 @@
 <?php
- 
- 
- 
 require_once 'config/settings.php';
 
 
@@ -25,7 +22,7 @@ class DeviceTAC {
     }
     private function registerDevice() {
         //New device. Data access granted for 180 sec
-        self::debug("ZSLDDEBUG_DEVICETAC_BUILD_1", json_decode( '{ "error": "Das Gerät wurde in der Geräte-Datenbank nicht gefunden. Neues Gerät, der Zugriff wird für 180 Sekunden gewährt damit eine Registrierung stattfinden kann." }' ) );
+        self::debug("ZSLDDEBUG_REGISTERDEVICE_newdevice", json_decode( '{ "error": "Das Gerät wurde in der Geräte-Datenbank nicht gefunden. Neues Gerät, der Zugriff wird für 180 Sekunden gewährt damit eine Registrierung stattfinden kann." }' ) );
         self::session();
         self::write( 'auth', false );
         self::commit();
@@ -34,19 +31,36 @@ class DeviceTAC {
 
         return $response;
     }
-    public function headers($methods) {
-        
+    public function headers($methods, $headers = "Content-Type, Authorization, X-Requested-With", $cache = 86400 /* 86400 cache for 1 day */) {
+
+        // Allow from any origin
         if (isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] != '') {
             foreach ($this->allowedOrigins as $allowedOrigin) {
                 if (preg_match('#' . $allowedOrigin . '#', $_SERVER['HTTP_ORIGIN'])) {
-                    header('Access-Control-Allow-Origin: ' . $_SERVER['HTTP_ORIGIN']);
-                    header('Access-Control-Allow-Methods: ' . $methods);
-                    header('Access-Control-Max-Age: 1000');
-                    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+                    header("Access-Control-Allow-Origin: ".$_SERVER['HTTP_ORIGIN']);
                     header('Access-Control-Allow-Credentials: true');
-                    break;
+                    header('Access-Control-Max-Age: ' . $cache);
+                    header("Vary: Origin");
                 }
             }
+        }
+
+        // Access-Control headers are received during OPTIONS requests
+        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+
+            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+                header("Access-Control-Allow-Methods: " . $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']);
+            } else {
+                header("Access-Control-Allow-Methods: " . $methods);
+            }     
+
+            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+                header("Access-Control-Allow-Headers: " . $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
+            } else {
+                header("Access-Control-Allow-Headers: " . $headers);
+            }
+
+            exit(0);
         }
 
         header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
@@ -98,8 +112,6 @@ class DeviceTAC {
         $redirectObject->param = !strpos($_SERVER['QUERY_STRING'], "redirect_param=") ? "" : str_replace("|", "&", preg_replace("/.*redirect_param=(.*?)&.*/", "?$1", $_SERVER['QUERY_STRING']));
         $redirectObject->location = $redirectObject->transport  . "://" . $redirectObject->targethost . $redirectObject->path . ( $parameter == "" && $redirectObject->query == "" ? "" : "?" ) . ( $parameter != "" ? $parameter . "&" : "" ) . ( $redirectObject->query != "" ? $redirectObject->query : "" );
 
-
-
         if ( !$redirect ) {
             $response = $redirectObject;
         } else {
@@ -118,9 +130,13 @@ class DeviceTAC {
         if ( $lifetime !== "" ) { 
             session_set_cookie_params ( "+" . SESSION_GC_MAXLIFETIME . " seconds" /* $lifetime */, "/map/", ".zso-aargausued.ch", TRUE, FALSE );
         }
-        session_save_path( DATA_PATH );
+        self::debug("ZSLDDEBUG_SESSION_path", json_decode( '{ "sessionpath": "' . session_save_path() . '", "targetpath": "' . realpath( DATA_PATH ) . '", "sessionstatus": "' . session_status()  . '" }') );
+
+        session_save_path( realpath( getcwd() . "/" . DATA_PATH ) );
         session_name( "ZSLDSESSION" );
         session_start();
+
+        self::debug("ZSLDDEBUG_SESSION_currentpath", json_decode( '{ "sessionpath": "' . session_save_path() . '", "sessionstatus": "' . session_status()  . '" }') );
         //self::write( 'device', DEVICE_TAC );
         if ( $lifetime !== "" ) {
             self::write( 'valid', date(DATE_ATOM, strtotime( $lifetime , time() ) ) );
@@ -128,7 +144,7 @@ class DeviceTAC {
     }
     public static function restore( $lifetime = "+" . SESSION_GC_MAXLIFETIME . " seconds" ) { 
         if ( session_status() === 1 ) {
-            self::debug("ZSLDDEBUG_ZSLDSESSION_RESTORE_start", json_decode( '{"STATUS": "1"}') );
+            self::debug("ZSLDDEBUG_SESSION_RESTORE_start", json_decode( '{"STATUS": "1"}') );
             self::session();
         }
 
@@ -144,7 +160,7 @@ class DeviceTAC {
             if ( ini_get("session.use_cookies") ) {
                 $params = session_get_cookie_params();
                 setcookie( session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"] );
-                self::debug("ZSLDDEBUG_ZSLDSESSION_RESTORE_delete_cookie", json_decode( '{"STATUS":"2", "PARAMS":' .  json_encode( $params ) . '}') );
+                self::debug("ZSLDDEBUG_SESSION_RESTORE_delete_cookie", json_decode( '{"STATUS":"2", "PARAMS":' .  json_encode( $params ) . '}') );
             }
             
             // Session ID
@@ -152,7 +168,7 @@ class DeviceTAC {
 
             // Session neu starten
             self::session($lifetime);
-            self::debug("ZSLDDEBUG_ZSLDSESSION_RESTORE_restart", json_decode( '{"STATUS":"2", "SID":"' . $sid . '", "LIFETIME":"' . $lifetime . '"}' ) );
+            self::debug("ZSLDDEBUG_SESSION_RESTORE_restart", json_decode( '{"STATUS":"2", "SID":"' . $sid . '", "LIFETIME":"' . $lifetime . '"}' ) );
         }
     }
     public static function destroy() { 
@@ -248,14 +264,14 @@ class DeviceTAC {
                     $expiration = $duration . " seconds";
                 }
 
-                self::debug("ZSLDDEBUG_DEVICETAC_BUILD_4", json_decode( '{ "decision": "' . $User['decision'] . '", "periode": "' . $User['properties']['Periode'] . '", "expiration": "' . $expiration . '", "user": ' . json_encode( $User ) . ' }') );
+                self::debug("ZSLDDEBUG_GETUSER_user", json_decode( '{ "decision": "' . $User['decision'] . '", "periode": "' . $User['properties']['Periode'] . '", "expiration": "' . $expiration . '", "user": ' . json_encode( $User ) . ' }') );
             } else {
                 //Can't find user in UserDB. Data access prohibited
-                self::debug("ZSLDDEBUG_DEVICETAC_BUILD_3",  json_decode( '{ "error": "Der Benutzer konnte in der Benutzer-Datenbank nicht gefunden werden. Der Zugriff wird verweigert." }' ) );
+                self::debug("ZSLDDEBUG_GETUSER_nouser",  json_decode( '{ "error": "Der Benutzer konnte in der Benutzer-Datenbank nicht gefunden werden. Der Zugriff wird verweigert." }' ) );
             }
         } else {
             //Can't parse UserDB. Data access prohibited
-            self::debug("ZSLDDEBUG_DEVICETAC_BUILD_2",  json_decode( '{ "error": "Die Benutzer-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert." }' ) );
+            self::debug("ZSLDDEBUG_GETUSER_nodb",  json_decode( '{ "error": "Die Benutzer-Datenbank kann nicht gelesen werden. Der Zugriff wird verweigert." }' ) );
         }
 
         return array( "user" => $User, "duration" => $duration, "expiration" => $expiration );
@@ -283,7 +299,7 @@ class DeviceTAC {
         self::abort();
 
         if ( $Person) {
-            $rec = self::getuser( $Person);
+            $rec = self::getuser( $Person );
             $User = $rec['user'];
             $expiration = $rec['expiration'];
         } else {

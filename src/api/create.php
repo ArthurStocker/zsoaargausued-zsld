@@ -21,16 +21,13 @@ switch($requestMethod) {
 		 * allow only if AUTHenticatied user
 		 */
 		if ( DeviceTAC::read( 'auth' ) ) {
-			if (array_key_exists('permissions', $_GET)) {
+			if (array_key_exists('type', $_GET) && isset($_GET['type']) && $_GET['type'] == 'access' && array_key_exists('object', $_GET) && isset($_GET['object']) && $_GET['object'] == 'user') {
 				$data = file_get_contents("php://input");
-				$transaction = $api->create($data, (string)$_GET['permissions'], (string)constant("DATASTORE_" . strtoupper($_GET['permissions'])), json_decode($data)->id);
+				$transaction = $api->create($data, (string)$_GET['type'], (string)constant("DATASTORE_" . strtoupper($_GET['type'])), json_decode($data)->id);
 			}
 		} else {
 			$users->init();
-			if (array_key_exists('otpauth', $_GET)) {
-				$data = file_get_contents("php://input");
-				$transaction = $users->otpauth($_GET, $data);
-			} elseif (array_key_exists('register', $_GET)) {
+			if (array_key_exists('type', $_GET) && isset($_GET['type']) && $_GET['type'] == 'access' && array_key_exists('object', $_GET) && isset($_GET['object']) && $_GET['object'] == 'user') {
 				$data = file_get_contents("php://input");
 				$transaction = $users->registration($_GET, $data);
 			}

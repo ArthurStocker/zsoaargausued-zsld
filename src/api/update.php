@@ -80,7 +80,11 @@ switch($requestMethod) {
 			echo json_encode($transaction, JSON_PRETTY_PRINT);
 		} else {
 			//header("HTTP/1.0 404 Not Found");
-			header("HTTP/1.0 403 Forbidden");
+			if ( DeviceTAC::read( 'auth' ) ) {
+				header("HTTP/1.0 403 Forbidden");
+			} else {
+				header("HTTP/1.0 401 Unauthorized");
+			}
 		}
 		break;
 	default:

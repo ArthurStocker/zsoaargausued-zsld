@@ -254,13 +254,14 @@ class ObjectStore {
     public static function update($data, $type, $oid, $filename, $debug = false) {
 		$store = new self();
         $store->debug = $debug;
+
         if ( DeviceTAC::isValid() ) {
             if ( file_exists($filename) ) {
                 $store->_parse($filename);
             }
             if ( $store->success() ) {
                 $object = json_decode($data);
-                
+
                 if ( gettype($object) === "object") {
                     $store->_set($object, $type, $oid);
                 } else {
