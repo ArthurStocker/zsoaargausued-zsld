@@ -30,8 +30,6 @@ ini_set('session.gc_divisor', SESSION_GC_DIVISOR); # default 100
 ini_set('session.gc_probability', SESSION_GC_PROBABILITY); # default 1
 ini_set('session.gc_maxlifetime', SESSION_GC_MAXLIFETIME); # default 1440 sec
 
+require_once '../wp-content/uploads/sms_daten.php';
 
- 
- 
- 
 ?>

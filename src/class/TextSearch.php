@@ -12,7 +12,7 @@ class TextSearch {
 
         return $response;
     }
-    public static function build($rows, $data) {
+    public static function build($xlsx, $id, $data) {
         $self = new self();
         $geojson = $self->response();
         $headers = []; // Produce array keys from the array values of 1st array element
@@ -23,43 +23,53 @@ class TextSearch {
         $geojson->options['format'] = json_decode($data['format']);
         $geojson->options['delimiter'] = $data['delimiter'];
 
-        if (DeviceTAC::isValid() && $rows) {
-            foreach ( $rows as $k => $r ) {
-                if ( $k === 0 ) {
-                    $headers = $r;
-                    continue;
-                }
-                $record = array_combine( $headers, $r);
-                foreach ( $geojson->options['keys'] as $f ) {
-                    $string = '';
-                    if ( property_exists( $geojson->options['format'], $f ) ) {
-                        if ( property_exists( $geojson->options['format']->$f, "p" ) ) {
-                            $string .= $geojson->options['format']->$f->p;
-                        }
-                        $string .= $record[$f];
-                        if ( property_exists( $geojson->options['format']->$f, "s" ) ) {
-                            $string .= $geojson->options['format']->$f->s;
-                        }
-                    } else {
-                        $string = $record[$f];
-                    }
-                    $selected[] = $string;
-                }
-                $string = join( $geojson->options['delimiter'], $selected );
-                if ( strpos( $string , $geojson->options['value'] ) !== false ) {
-                    $object = new stdClass();
-                    $object->name = join( $geojson->options['delimiter'], $selected );
-                    $object->properties = $record;
+        if (gettype($id) == "integer" ) {
+            $id = array($id);
+        }
 
-                    if (defined("DEVICE_TAC")) {
-                        $object->executingdevice = constant("DEVICE_TAC");
-                    } else {
-                        $object->executingdevice = '';
-                    }
+        if (DeviceTAC::isValid() && $xlsx && (gettype($id) == "array")) {
+            foreach ( $id as $i) {
+                $rows = $xlsx->rows($i);
+                if ($rows) {
+                    foreach ( $rows as $k => $r ) {
+                        if ( $k === 0 ) {
+                            $headers = $r;
+                            continue;
+                        }
+                        $record = array_combine( $headers, $r);
+                        foreach ( $geojson->options['keys'] as $f ) {
+                            $string = '';
+                            if ( property_exists( $geojson->options['format'], $f ) ) {
+                                if ( property_exists( $geojson->options['format']->$f, "p" ) ) {
+                                    $string .= $geojson->options['format']->$f->p;
+                                }
+                                $string .= $record[$f];
+                                if ( property_exists( $geojson->options['format']->$f, "s" ) ) {
+                                    $string .= $geojson->options['format']->$f->s;
+                                }
+                            } else {
+                                $string = $record[$f];
+                            }
+                            $selected[] = $string;
+                        }
+                        $string = join( $geojson->options['delimiter'], $selected );
+                        if ( strpos( $string , $geojson->options['value'] ) !== false ) {
+                            $object = new stdClass();
+                            $object->name = join( $geojson->options['delimiter'], $selected );
+                            $object->properties = $record;
+                            $object->properties->external = $i;
 
-                    $geojson->results[] = $object;
+                            if (defined("DEVICE_TAC")) {
+                                $object->executingdevice = constant("DEVICE_TAC");
+                            } else {
+                                $object->executingdevice = '';
+                            }
+
+                            $geojson->results[] = $object;
+                        }
+                        $selected = [];
+                    }
                 }
-                $selected = [];
             }
         }
 

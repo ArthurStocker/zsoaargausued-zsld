@@ -417,6 +417,10 @@ class UserRegAndAuth {
                 $Secret = $User["properties"]["Secret"];
             }
     
+            if ( !$User ) {
+                $User["person"] = json_decode($data, true);
+            }
+
             if ( $User && isset($User["person"]["properties"]["Mobilnummer"]) && isset($Secret) && $Secret != "" ) {
                 //The url you wish to send the POST request to
                 $url = SMS_URL;
@@ -452,7 +456,7 @@ class UserRegAndAuth {
                 $this->transaction['data'] = curl_exec($smsblaster);
                 $this->transaction['properties'] = [];
                 /*
-                $this->transaction['properties']['person'] = $Person;
+                $this->transaction['properties']['person'] = $User["person"];
                 $this->transaction['properties']['mobile'] = preg_replace('/\s+/', '', $User["person"]["properties"]["Mobilnummer"]);
                 $this->transaction['properties']['json'] = $json;
                 $this->transaction['properties']['code'] = curl_getinfo($smsblaster, CURLINFO_HTTP_CODE);
@@ -464,8 +468,9 @@ class UserRegAndAuth {
                 $this->transaction['data'] = "failed";
                 $this->transaction['properties'] = [];
                 /*
-                $this->transaction['properties']['person'] = $User;
+                $this->transaction['properties']['user'] = $User;
                 $this->transaction['properties']['data'] = $data;
+                $this->transaction['properties']['secret'] = $Secret;
                 */
                 $this->transaction['executingdevice'] = session_id();
                 $this->transaction['errno'] = 422;
@@ -556,7 +561,12 @@ class UserRegAndAuth {
     
             DeviceTAC::commit();
         } else {
+            $this->transaction['data'] = [json_encode($data), json_encode($otp), $json];
+            $this->transaction['display'] = $data['display'];
+            $this->transaction['executingdevice'] = session_id();
+            $this->transaction['result'] = "failed";
             $this->transaction['errno'] = 422;
+            $this->transaction['error'] = "permissions not set, otp failure";
         }
 
         return $this->transaction;

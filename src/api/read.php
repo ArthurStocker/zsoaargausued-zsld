@@ -19,7 +19,7 @@ switch($requestMethod) {
 			if ( $_GET['type'] != "report" ) {
 				if ( isset($_GET['object']) && ( DeviceTAC::read( 'auth' ) || ( (string)$_GET['object'] !== 'users' ) ) ) {
 					if ( isset($_GET['id']) ) {
-						$transaction = $api->read($_GET, (string)$_GET['type'], (string)$_GET['object'], (int)$_GET['id']);
+						$transaction = $api->read($_GET, (string)$_GET['type'], (string)$_GET['object'], json_decode($_GET['id']));
 					} else {
 						$transaction = $api->read($_GET, (string)$_GET['type'], (string)$_GET['object'], 0);
 					}

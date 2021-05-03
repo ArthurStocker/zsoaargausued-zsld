@@ -248,8 +248,8 @@ if (defined("ERROR")) {
                                     otp += '        <span class="input-group-btn" style="font-size: 14px;">';
 
                                     if (response.properties.OTPAuthURL != "" || response.properties.OTPAuthQRCode != "") {
-                                      if (response.properties.properties.OTPAuthURL != "") {
-                                        otp += '            <button id="zsld-tracking-otpurl-button" class="btn btn-primary" type="button" onclick="(function(){ window.location.href = ' + "'" + data.properties.OTPAuthURL + "'" + '; })()">Authenticator öffnen</button>';
+                                      if (response.properties.OTPAuthURL != "") {
+                                        otp += '            <button id="zsld-tracking-otpurl-button" class="btn btn-primary" type="button" onclick="(function(){ window.location.href = ' + "'" + response.properties.OTPAuthURL + "'" + '; })()">Authenticator öffnen</button>';
                                       }
                                       if (response.properties.OTPAuthQRCode != "") {
                                         otp += '            <button id="zsld-tracking-otpqrcode-button" class="btn btn-primary" type="button" data-toggle="modal" data-target="#zsld-tracking-otpqrcode-modal">Authenticator QR Code</button>';
@@ -293,7 +293,9 @@ if (defined("ERROR")) {
 
                                     $("#zsld-tracking-otpsms-button").on( "click", {person: person}, function(evt) {
                                       $http_otpauthsms.post(URL_OTPAUTHSMS, JSON.stringify({
-                                        "id": evt.data.person.properties["IPN"]
+                                        "id": evt.data.person.properties["IPN"],
+                                        "display": "<b>" + evt.data.person.properties["Vorname"] + " " + evt.data.person.properties["Name"] + "</b>",
+                                        "properties": evt.data.person.properties
                                       }));
                                     });
 

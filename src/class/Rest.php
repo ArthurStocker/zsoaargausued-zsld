@@ -89,7 +89,7 @@ class Rest {
                         $response = Feature::build( $xlsx->rows($id) );
                     }
                     if ($type === 'search') {
-                        $response = TextSearch::build( $xlsx->rows($id), $data );
+                        $response = TextSearch::build( $xlsx, $id, $data );
                     }
                     if ($type === 'system') {
                         $response = SystemProperty::build( $xlsx->rows($id), ($id == 2) );
